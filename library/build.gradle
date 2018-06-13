@@ -35,10 +35,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation 'com.android.support:appcompat-v7:27.+'
-
+    implementation 'com.github.XXQAQ:ProjectDefine:0.+'
     //    高德
     implementation 'com.amap.api:3dmap:latest.integration'
     implementation 'com.amap.api:location:latest.integration'
     implementation 'com.amap.api:search:latest.integration'
-    implementation 'com.github.XXQAQ:ProjectDefine:0.1.3'
+
 }
