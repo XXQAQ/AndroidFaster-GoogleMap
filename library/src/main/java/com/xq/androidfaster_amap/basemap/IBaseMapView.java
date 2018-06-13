@@ -96,7 +96,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
         myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
         myLocationStyle.interval(1000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
         myLocationStyle.strokeColor(Color.TRANSPARENT);// 设置圆形的边框颜色
-        myLocationStyle.radiusFillColor(getContext().getResources().getColor(getLocationRadiusColor()));// 设置圆形的填充颜色
+        myLocationStyle.radiusFillColor(getLocationRadiusColor());// 设置圆形的填充颜色
         getMapBuilder().map.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
         getMapBuilder().map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
 
@@ -269,6 +269,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
     @Override
     default void onDestroy() {
         getMapBuilder().mapView.onDestroy();
+        getMapBuilder().locationClient.onDestroy();
     }
 
     @Override
