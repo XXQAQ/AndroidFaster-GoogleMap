@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.basemap.maputil;
+package com.xq.androidfaster_amap.util;
 
 public class ChString {
 	public static final String Kilometer = "\u516c\u91cc";// "公里";

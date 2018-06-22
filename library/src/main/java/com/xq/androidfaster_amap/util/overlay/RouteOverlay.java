@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.basemap.maputil.overlay;
+package com.xq.androidfaster_amap.util.overlay;
 
 
 import android.content.Context;

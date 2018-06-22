@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.event;
+package com.xq.androidfaster_amap.eventbus;
 
 
 import com.amap.api.location.AMapLocation;

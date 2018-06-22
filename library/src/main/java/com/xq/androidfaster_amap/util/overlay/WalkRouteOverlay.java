@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.basemap.maputil.overlay;
+package com.xq.androidfaster_amap.util.overlay;
 
 
 import android.content.Context;
@@ -11,7 +11,7 @@ import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkStep;
-import com.xq.androidfaster_amap.basemap.maputil.AMapServicesUtil;
+import com.xq.androidfaster_amap.util.AMapServicesUtil;
 
 import java.util.List;
 

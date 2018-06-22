@@ -41,13 +41,12 @@ import com.amap.api.services.route.RouteResult;
 import com.amap.api.services.route.RouteSearch;
 import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkRouteResult;
-import com.xq.androidfaster_amap.R;
 import com.xq.androidfaster_amap.bean.behavior.MarkBehavior;
-import com.xq.androidfaster_amap.basemap.maputil.overlay.BusRouteOverlay;
-import com.xq.androidfaster_amap.basemap.maputil.overlay.DrivingRouteOverlay;
-import com.xq.androidfaster_amap.basemap.maputil.overlay.RideRouteOverlay;
-import com.xq.androidfaster_amap.basemap.maputil.overlay.RouteOverlay;
-import com.xq.androidfaster_amap.basemap.maputil.overlay.WalkRouteOverlay;
+import com.xq.androidfaster_amap.util.overlay.BusRouteOverlay;
+import com.xq.androidfaster_amap.util.overlay.DrivingRouteOverlay;
+import com.xq.androidfaster_amap.util.overlay.RideRouteOverlay;
+import com.xq.androidfaster_amap.util.overlay.RouteOverlay;
+import com.xq.androidfaster_amap.util.overlay.WalkRouteOverlay;
 import com.xq.projectdefine.base.abs.AbsView;
 
 import java.util.ArrayList;
