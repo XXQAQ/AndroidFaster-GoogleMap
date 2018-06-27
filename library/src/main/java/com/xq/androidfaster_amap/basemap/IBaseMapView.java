@@ -48,7 +48,6 @@ import com.xq.androidfaster_amap.util.overlay.RideRouteOverlay;
 import com.xq.androidfaster_amap.util.overlay.RouteOverlay;
 import com.xq.androidfaster_amap.util.overlay.WalkRouteOverlay;
 import com.xq.projectdefine.base.abs.AbsView;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,9 +58,35 @@ import java.util.List;
 
 public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
 
+    public static final int MARKERANIMATE_DURATION = 500;
+
     @Override
     default void afterOnCreate(Bundle savedInstanceState) {
+        initMapView(savedInstanceState);
+    }
 
+    @Override
+    default void onResume() {
+        getMapBuilder().mapView.onResume();
+    }
+
+    @Override
+    default void onPause() {
+        getMapBuilder().mapView.onPause();
+    }
+
+    @Override
+    default void onDestroy() {
+        getMapBuilder().mapView.onDestroy();
+        getMapBuilder().locationClient.onDestroy();
+    }
+
+    @Override
+    default void onSaveInstanceState(Bundle outState) {
+        getMapBuilder().mapView.onSaveInstanceState(outState);
+    }
+
+    default void initMapView(Bundle savedInstanceState){
         getMapBuilder().mapView = (TextureMapView) getRootView().findViewById(getContext().getResources().getIdentifier("mapView", "id", getContext().getPackageName()));
 
         getMapBuilder().mapView.onCreate(savedInstanceState);
@@ -77,7 +102,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
                 if (getMapBuilder().isFirstLocation)
                 {
                     getMapBuilder().isFirstLocation = false;
-                    resumeLocationPoint();
+                    moveMapToLocationPoint();
                 }
             }
         });
@@ -119,8 +144,8 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
         };
         getMapBuilder().map.setInfoWindowAdapter(adapter);
 
-        //map相关监听
 
+        //map相关监听
         getMapBuilder().map.setOnMapClickListener(new AMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -132,13 +157,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
             @Override
             public boolean onMarkerClick(Marker marker) {
 
-                beforeMarkerClick(marker);
-
-                marker.showInfoWindow();
-
                 getMapBuilder().lastMarker = marker;
 
                 afterMarkerClick(marker);
+
+                marker.showInfoWindow();
 
                 return true;
             }
@@ -250,33 +273,12 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
                 }
 
                 afterGetRouteFinish(result,errorCode);
-
             }
         });
     }
 
-    @Override
-    default void onResume() {
-        getMapBuilder().mapView.onResume();
-    }
-
-    @Override
-    default void onPause() {
-        getMapBuilder().mapView.onPause();
-    }
-
-    @Override
-    default void onDestroy() {
-        getMapBuilder().mapView.onDestroy();
-        getMapBuilder().locationClient.onDestroy();
-    }
-
-    @Override
-    default void onSaveInstanceState(Bundle outState) {
-        getMapBuilder().mapView.onSaveInstanceState(outState);
-    }
-
-    default List<Marker> setMarks(List<MarkBehavior> list){
+    //设置Marks
+    default void setMarks(List<MarkBehavior> list){
 
         List<Marker> list_mark = new LinkedList<>();
 
@@ -294,7 +296,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
             marker.setObject(behavior);
 
             Animation animation = new ScaleAnimation(0,1,0,1);
-            animation.setDuration(500);
+            animation.setDuration(MARKERANIMATE_DURATION);
             animation.setInterpolator(new AccelerateInterpolator());
             marker.setAnimation(animation);
             marker.startAnimation();
@@ -302,16 +304,53 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
             list_mark.add(marker);
         }
 
-        return list_mark;
-
+        getMapBuilder().list_marker.addAll(list_mark);
     }
 
-    default void clearMark(final List<Marker> list) {
+    //设置Marks(新添加进来会增加至地图，已存在则不变，不存在则会被删除)
+    default void setDifferentMarks(final List<MarkBehavior> list){
+
+        final List<MarkBehavior> list_newMarkBehavior = new LinkedList<>();
+        final List<MarkBehavior> list_newCopy = new LinkedList<>();
+        final List<Marker> list_removeMarker = new LinkedList<>();
+
+        //遍历所有旧Marker，当发现旧marker在新集合中不存在的时候，则在原集合中删除且标记到删除集合中
+        for (Marker marker : getMapBuilder().list_marker)
+        {
+            MarkBehavior markBehavior = (MarkBehavior) marker.getObject();
+            if (!list.contains(markBehavior))
+            {
+                list_removeMarker.add(marker);
+            }
+        }
+
+        removeMarks(list_removeMarker);
+
+        for (Marker marker : getMapBuilder().list_marker)
+        {
+            MarkBehavior markBehavior = (MarkBehavior) marker.getObject();
+            list_newCopy.add(markBehavior);
+        }
+
+        //遍历所有新markerBehavior，只要该marker未添加到地图上，则将Marker标记到新集合中
+        for (MarkBehavior new_markBehavior : list)
+        {
+            if (!list_newCopy.contains(new_markBehavior))
+            {
+                list_newMarkBehavior.add(new_markBehavior);
+            }
+        }
+
+        setMarks(list_newMarkBehavior);
+    }
+
+    //删除指定Markes
+    default void removeMarks(final List<Marker> list) {
 
         for (Marker marker : list)
         {
             Animation animation = new AlphaAnimation(1,0);
-            animation.setDuration(500);
+            animation.setDuration(MARKERANIMATE_DURATION);
             animation.setInterpolator(new LinearInterpolator());
             marker.setAnimation(animation);
             marker.startAnimation();
@@ -325,28 +364,42 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
                     marker.remove();
                 }
             }
-        },500);
+        },MARKERANIMATE_DURATION);
+
+        getMapBuilder().list_marker.removeAll(list);
     }
 
+    //清空所有Marker
+    default void clearMarkes(){
+        removeMarks(getMapBuilder().list_marker);
+    }
+
+    //清空地图
     default void clearMap() {
         getMapBuilder().map.clear(true);
+        getMapBuilder().lastMarker = null;
+        getMapBuilder().list_marker.clear();
     }
 
+    //步行路线规划
     default void walk(LatLng latLng_from, LatLng latLng_to) {
         RouteSearch.WalkRouteQuery query = new RouteSearch.WalkRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(latLng_from.latitude,latLng_from.longitude),new LatLonPoint(latLng_to.latitude,latLng_to.longitude)));
         getMapBuilder().routeSearch.calculateWalkRouteAsyn(query);
     }
 
+    //交通路线规划
     default void traffic(LatLng latLng_from, LatLng latLng_to, String city) {
         RouteSearch.BusRouteQuery query = new RouteSearch.BusRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(latLng_from.latitude,latLng_from.longitude),new LatLonPoint(latLng_to.latitude,latLng_to.longitude)), RouteSearch.BUS_DEFAULT, city,1);
         getMapBuilder().routeSearch.calculateBusRouteAsyn(query);
     }
 
+    //驾车路线规划
     default void driver(LatLng latLng_from, LatLng latLng_to) {
         RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(latLng_from.latitude,latLng_from.longitude),new LatLonPoint(latLng_to.latitude,latLng_to.longitude)), RouteSearch.WALK_DEFAULT, null, null, "");
         getMapBuilder().routeSearch.calculateDriveRouteAsyn(query);
     }
 
+    //清除上次路线规划
     default void removeLastLines() {
         if (getMapBuilder().lastOverlay != null)
         {
@@ -355,6 +408,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
         }
     }
 
+    //隐藏弹窗
     default void hideInfoWindow() {
         if (getMapBuilder().lastMarker != null)
         {
@@ -362,20 +416,25 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
         }
     }
 
-    //回到定位点
-    default void resumeLocationPoint(){
+    //移动地图至某点
+    default void moveMapToPoint(double lat, double lon){
+        getMapBuilder().map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),17));
+    }
+
+    //移动地图至当前位置
+    default void moveMapToLocationPoint(){
 
         if (getPresenter().getLocation() != null)
         {
-            getMapBuilder().map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude()),17));
+            moveMapToPoint(getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude());
         }
         else
         {
-            showGetLocationErro();
+            afterGetLocationErro();
         }
-
     }
 
+    //获取当前地图可视经纬度(上左与右下的经纬度)
     default double[][] getMapArea() {
 
         Projection projection = getMapBuilder().map.getProjection();
@@ -386,43 +445,53 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
         return new double[][]{new double[]{topLeft.latitude,topLeft.longitude},new double[]{bottomRight.latitude,bottomRight.longitude}};
     }
 
-    public abstract void showGetLocationErro();
+    //获取当前地图中心经纬度
+    default double[] getMapCenter(){
+        LatLng latLng = getMapBuilder().map.getCameraPosition().target;
+        return new double[]{latLng.latitude,latLng.longitude};
+    }
 
+    //重写该方法处理定位失败后逻辑
+    public abstract void afterGetLocationErro();
+
+    //重写该方法返回定位点图标
     public abstract int getLocationIcon();
 
+    //重写该方法返回定位圆圈颜色
     public abstract int getLocationRadiusColor();
 
+    //重写该方法返回Marker样式
     public abstract ArrayList<BitmapDescriptor> getMarkerDescript(MarkBehavior behavior);
 
-    //可以根据具体对象设置弹窗样式
+    //重写该方法返回弹窗样式
     public abstract View getWindowView(MarkBehavior behavior);
 
-    //标记点击后调用，以处理更多程序员自己的逻辑
+    //标记点击后调用
     public abstract void afterMarkerClick(Marker marker);
 
-    public abstract void beforeMarkerClick(Marker marker);
-
-    //地图状态改变后调用，以处理更多程序员自己的逻辑
+    //地图状态改变后调用
     public abstract void afterMapStatusChangeFinish(CameraPosition cameraPosition);
 
     //点击地图后调用
     public abstract void afterMapClick(LatLng latLng);
 
+    //获取路线规划成功后调用
     public abstract void afterGetRouteSuccess(RouteResult result);
 
-    //无论路线规划成功还是失败，最终都会回调的方法
+    //路线规划结束后调用（还是成功或者失败失败）
     public abstract void afterGetRouteFinish(RouteResult result, int erroCode);
-
 
     public MapBuilder getMapBuilder();
 
     public static class MapBuilder{
+
         public TextureMapView mapView ;
 
         public AMap map;
 
         public AMapLocationClient locationClient;
 
+        private List<Marker> list_marker = new LinkedList<>();
         public Marker lastMarker;
 
         public RouteSearch routeSearch;

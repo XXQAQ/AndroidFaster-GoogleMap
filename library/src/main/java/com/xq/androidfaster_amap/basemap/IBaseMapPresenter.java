@@ -11,6 +11,7 @@ import com.xq.projectdefine.base.abs.AbsPresenter;
 public interface IBaseMapPresenter<T extends IBaseMapView> extends AbsPresenter<T> {
 
 
+    //该方法用于接受定位数据，开发中建议使用afterReceiveLocation方法免去判空等操纵
     default void onReceiveLocation(AMapLocation location) {
         if (location != null)
         {
@@ -50,12 +51,12 @@ public interface IBaseMapPresenter<T extends IBaseMapView> extends AbsPresenter<
         }
     }
 
+    //该方法在接收到定位数据后调用，重写该方法完成后续逻辑
+    public abstract void afterReceiveLocation(AMapLocation location);
+
     default AMapLocation getLocation() {
         return getMapBuilder().location;
     }
-
-    //该方法在接受到定位数据后回调回来
-    public abstract void afterReceiveLocation(AMapLocation location);
 
     public MapBuilder getMapBuilder();
 
