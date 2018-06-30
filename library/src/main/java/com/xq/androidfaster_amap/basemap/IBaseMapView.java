@@ -22,6 +22,7 @@ import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
@@ -52,13 +53,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by xq on 2017/4/11 0011.
- */
 
 public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
 
-    public static final int MARKERANIMATE_DURATION = 500;
+    public static int MARKERANIMATE_DURATION = 500;
 
     @Override
     default void afterOnCreate(Bundle savedInstanceState) {
@@ -78,7 +76,6 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
     @Override
     default void onDestroy() {
         getMapBuilder().mapView.onDestroy();
-        getMapBuilder().locationClient.onDestroy();
     }
 
     @Override
@@ -92,27 +89,6 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
         getMapBuilder().mapView.onCreate(savedInstanceState);
 
         getMapBuilder().map = getMapBuilder().mapView.getMap();
-
-        //定位
-        getMapBuilder().locationClient = new AMapLocationClient(getContext().getApplicationContext());
-        getMapBuilder().locationClient.setLocationListener(new AMapLocationListener() {
-            @Override
-            public void onLocationChanged(AMapLocation location) {
-                getPresenter().onReceiveLocation(location);
-                if (getMapBuilder().isFirstLocation)
-                {
-                    getMapBuilder().isFirstLocation = false;
-                    moveMapToLocationPoint();
-                }
-            }
-        });
-        AMapLocationClientOption clientOption = new AMapLocationClientOption();
-        clientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        clientOption.setInterval(1000);
-        clientOption.setNeedAddress(true);
-        clientOption.setMockEnable(true);
-        getMapBuilder().locationClient.setLocationOption(clientOption);
-        getMapBuilder().locationClient.startLocation();
 
         //定位点初始化
         MyLocationStyle myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
@@ -253,14 +229,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
 
                             getMapBuilder().lastOverlay = overlay;
 
-                            afterGetRouteSuccess(result);
-
                         }
                         else    if (result != null && list_path == null)
                         {
                             Toast.makeText(getContext(),"无路线规划结果",Toast.LENGTH_SHORT).show();
                         }
-
                     }
                     else
                     {
@@ -400,7 +373,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
     }
 
     //清除上次路线规划
-    default void removeLastLines() {
+    default void removeLastRoute() {
         if (getMapBuilder().lastOverlay != null)
         {
             getMapBuilder().lastOverlay.removeFromMap();
@@ -416,9 +389,19 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
         }
     }
 
+    //移动地图至多个点组成的区域
+    default void moveMapToArea(double[][] position){
+
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+        for(int i=0;i<position.length;i++)
+            boundsBuilder.include(new LatLng(position[i][0],position[i][1]));
+
+        getMapBuilder().map.animateCamera(CameraUpdateFactory.newLatLngBounds( boundsBuilder.build(),18));
+    }
+
     //移动地图至某点
     default void moveMapToPoint(double lat, double lon){
-        getMapBuilder().map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),17));
+        getMapBuilder().map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),18));
     }
 
     //移动地图至当前位置
@@ -475,10 +458,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
     //点击地图后调用
     public abstract void afterMapClick(LatLng latLng);
 
-    //获取路线规划成功后调用
-    public abstract void afterGetRouteSuccess(RouteResult result);
-
-    //路线规划结束后调用（还是成功或者失败失败）
+    //路线规划结束后调用
     public abstract void afterGetRouteFinish(RouteResult result, int erroCode);
 
     public MapBuilder getMapBuilder();
@@ -489,15 +469,12 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
 
         public AMap map;
 
-        public AMapLocationClient locationClient;
-
         private List<Marker> list_marker = new LinkedList<>();
         public Marker lastMarker;
 
         public RouteSearch routeSearch;
         public RouteOverlay lastOverlay;
 
-        public boolean isFirstLocation = true;
     }
 
 }

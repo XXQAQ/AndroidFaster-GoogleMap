@@ -3,9 +3,6 @@ package com.xq.androidfaster_amap.eventbus;
 
 import com.amap.api.location.AMapLocation;
 
-/**
- * Created by Administrator on 2017/9/22.
- */
 
 public class LocationEvent {
 

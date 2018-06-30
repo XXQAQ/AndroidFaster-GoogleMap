@@ -2,9 +2,6 @@ package com.xq.androidfaster_amap.bean.behavior;
 
 import java.io.Serializable;
 
-/**
- * Created by xq on 2017/6/30.
- */
 
 public interface MarkBehavior extends Serializable{
 
