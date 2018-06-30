@@ -20,7 +20,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsPresenter<
     @Override
     default void afterOnCreate(Bundle bundle) {
 
-        //如果不使用自带权限，请自行处理群贤后调用startLocation方法
+        //如果不使用自带权限方案，请处理权限后自行调用startLocation方法
         if (FasterInterface.isIsAutoPermission())
         {
             PermissionUtils.permission(PermissionConstants.LOCATION)
