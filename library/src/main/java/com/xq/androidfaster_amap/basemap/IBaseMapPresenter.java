@@ -35,9 +35,22 @@ public interface IBaseMapPresenter<T extends IBaseMapView> extends IBaseLocation
     }
 
     @Override
-    default void afterReceiveLocation(AMapLocation location) {
+    default void onReceiveLocation(AMapLocation location) {
+        IBaseLocationPresenter.super.onReceiveLocation(getLocation());
+
         if (getLocationBuilder().isFirstLocation)
             getBindView().moveMapToLocationPoint();
+    }
+
+    @Override
+    default LocationBuilder getLocationBuilder() {
+        return getMapBuilder();
+    }
+
+    public MapBuilder getMapBuilder();
+
+    public static class MapBuilder extends LocationBuilder {
+
     }
 
 }

@@ -70,7 +70,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsPresenter<
                 {
                     getLocationBuilder().location = location;
 
-                    afterReceiveLocation(location);
+                    onReceiveLocation(location);
 
                     if (getLocationBuilder().isFirstLocation)
                         getLocationBuilder().isFirstLocation = false;
@@ -91,7 +91,12 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsPresenter<
         return getLocationBuilder().location;
     }
 
-    //该方法在接收到定位数据后调用，重写该方法完成后续逻辑
+    //该方法在接收到定位数据后调用，您需要忽略此方法，而选择重写afterReceiveLocation完成后续逻辑
+    default void onReceiveLocation(AMapLocation location){
+        afterReceiveLocation(location);
+    }
+
+    //该方法在onReceiveLocation调用，重写该方法完成后续逻辑
     public abstract void afterReceiveLocation(AMapLocation location);
 
     public LocationBuilder getLocationBuilder();
