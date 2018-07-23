@@ -92,6 +92,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsPresenter<
     }
 
     //该方法在接收到定位数据后调用，您需要忽略此方法，而选择重写afterReceiveLocation完成后续逻辑
+    @Deprecated
     default void onReceiveLocation(AMapLocation location){
         afterReceiveLocation(location);
     }
