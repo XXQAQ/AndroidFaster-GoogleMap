@@ -52,6 +52,7 @@ import com.xq.projectdefine.base.abs.AbsView;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
@@ -469,7 +470,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsView<T> {
 
         public AMap map;
 
-        private List<Marker> list_marker = new LinkedList<>();
+        private CopyOnWriteArrayList<Marker> list_marker = new CopyOnWriteArrayList<>();
         public Marker lastMarker;
 
         public RouteSearch routeSearch;
