@@ -1,46 +1,12 @@
 package com.xq.androidfaster_amap.basemap;
 
 
-import android.content.Intent;
-import android.os.Bundle;
-
 import com.amap.api.location.AMapLocation;
+import com.xq.androidfaster_amap.baselocation.IBaseLocationPresenter;
+import com.xq.projectdefine.base.abs.AbsPresenter;
 
 
-public interface IBaseMapPresenter<T extends IBaseMapView> extends IBaseLocationPresenter<T> {
-
-    @Override
-    default void afterOnCreate(Bundle bundle) {
-        IBaseLocationPresenter.super.afterOnCreate(bundle);
-    }
-
-    @Override
-    default void onResume() {
-        IBaseLocationPresenter.super.onResume();
-    }
-
-    @Override
-    default void onPause() {
-        IBaseLocationPresenter.super.onPause();
-    }
-
-    @Override
-    default void onDestroy() {
-        IBaseLocationPresenter.super.onDestroy();
-    }
-
-    @Override
-    default void onActivityResult(int i, int i1, Intent intent) {
-        IBaseLocationPresenter.super.onActivityResult(i,i1,intent);
-    }
-
-    @Override
-    default void onReceiveLocation(AMapLocation location) {
-        IBaseLocationPresenter.super.onReceiveLocation(getLocation());
-
-        if (getLocationBuilder().isFirstLocation)
-            getBindView().moveMapToLocationPoint();
-    }
+public interface IBaseMapPresenter<T extends AbsMapView> extends AbsMapPresenter<T>,IBaseLocationPresenter<T> {
 
     @Override
     default LocationBuilder getLocationBuilder() {
@@ -49,7 +15,19 @@ public interface IBaseMapPresenter<T extends IBaseMapView> extends IBaseLocation
 
     public MapBuilder getMapBuilder();
 
-    public static class MapBuilder extends LocationBuilder {
+    public abstract class MapBuilder<T extends AbsMapView> extends LocationBuilder<T> implements AbsMapPresenter<T>{
+
+        public MapBuilder(AbsPresenter presenter) {
+            super(presenter);
+        }
+
+        @Override
+        public void onReceiveLocation(AMapLocation location) {
+            super.onReceiveLocation(getLocation());
+
+            if (isFirstLocation)
+                getBindView().moveMapToLocationPoint();
+        }
 
     }
 
