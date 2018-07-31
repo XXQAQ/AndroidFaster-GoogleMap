@@ -103,7 +103,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
                 public void onLocationChanged(AMapLocation location) {
                     if (location.getErrorCode() == 0)
                     {
-                        location = location;
+                        LocationBuilder.this.location = location;
 
                         onReceiveLocation(location);
 
