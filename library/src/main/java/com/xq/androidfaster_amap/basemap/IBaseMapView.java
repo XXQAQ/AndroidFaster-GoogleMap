@@ -134,51 +134,6 @@ public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
         return getMapBuilder().getMapCenter();
     }
 
-    @Override
-    default void afterGetLocationErro() {
-        getMapBuilder().afterGetLocationErro();
-    }
-
-    @Override
-    default int getLocationIcon() {
-        return getMapBuilder().getLocationIcon();
-    }
-
-    @Override
-    default int getLocationRadiusColor() {
-        return getMapBuilder().getLocationRadiusColor();
-    }
-
-    @Override
-    default ArrayList<BitmapDescriptor> getMarkerDescript(MarkBehavior behavior) {
-        return getMapBuilder().getMarkerDescript(behavior);
-    }
-
-    @Override
-    default View getWindowView(MarkBehavior behavior) {
-        return getMapBuilder().getWindowView(behavior);
-    }
-
-    @Override
-    default void afterMarkerClick(Marker marker) {
-        getMapBuilder().afterMarkerClick(marker);
-    }
-
-    @Override
-    default void afterMapStatusChangeFinish(CameraPosition cameraPosition) {
-        getMapBuilder().afterMapStatusChangeFinish(cameraPosition);
-    }
-
-    @Override
-    default void afterMapClick(LatLng latLng) {
-        getMapBuilder().afterMapClick(latLng);
-    }
-
-    @Override
-    default void afterGetRouteFinish(RouteResult result, int erroCode) {
-        getMapBuilder().afterGetRouteFinish(result,erroCode);
-    }
-
     public MapBuilder getMapBuilder();
 
     public abstract class MapBuilder<T extends AbsMapPresenter> extends AbsViewDelegate<T> implements AbsMapView<T> {
@@ -189,7 +144,7 @@ public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
 
         public AMap map;
 
-        private CopyOnWriteArrayList<Marker> list_marker = new CopyOnWriteArrayList<>();
+        public CopyOnWriteArrayList<Marker> list_marker = new CopyOnWriteArrayList<>();
         public Marker lastMarker;
 
         public RouteSearch routeSearch;
@@ -266,7 +221,7 @@ public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
             map.setOnMapClickListener(new AMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    afterMapClick(latLng);
+                    afterMapClick(latLng.latitude,latLng.longitude);
                 }
             });
 
@@ -574,6 +529,33 @@ public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
             LatLng latLng = map.getCameraPosition().target;
             return new double[]{latLng.latitude,latLng.longitude};
         }
+
+        //重写该方法处理定位失败后逻辑
+        protected abstract void afterGetLocationErro();
+
+        //重写该方法返回定位点图标
+        protected abstract int getLocationIcon();
+
+        //重写该方法返回定位圆圈颜色
+        protected abstract int getLocationRadiusColor();
+
+        //重写该方法返回Marker样式
+        protected abstract ArrayList<BitmapDescriptor> getMarkerDescript(MarkBehavior behavior);
+
+        //重写该方法返回弹窗样式
+        protected abstract View getWindowView(MarkBehavior behavior);
+
+        //标记点击后调用
+        protected abstract void afterMarkerClick(Marker marker);
+
+        //地图状态改变后调用
+        protected abstract void afterMapStatusChangeFinish(CameraPosition cameraPosition);
+
+        //点击地图后调用
+        protected abstract void afterMapClick(double lat,double lon);
+
+        //路线规划结束后调用
+        protected abstract void afterGetRouteFinish(RouteResult result, int erroCode);
 
     }
 

@@ -28,17 +28,6 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
         return getLocationBuilder().getLocation();
     }
 
-    @Override
-    @Deprecated
-    default void onReceiveLocation(AMapLocation location){
-        getLocationBuilder().onReceiveLocation(location);
-    }
-
-    @Override
-    default void afterReceiveLocation(AMapLocation location) {
-        getLocationBuilder().afterReceiveLocation(location);
-    }
-
     public LocationBuilder getLocationBuilder();
 
     public abstract class LocationBuilder<T extends AbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
@@ -55,7 +44,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
         @Override
         public void afterOnCreate(Bundle bundle) {
-            //如果不使用自带权限方案，请处理权限后自行调用startLocation方法
+            //如果不使用自带权限方案，请在处理权限后自行调用startLocation方法
             if (FasterInterface.isIsAutoPermission())
             {
                 PermissionUtils.permission(PermissionConstants.LOCATION)
@@ -128,11 +117,12 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
         //该方法在接收到定位数据后调用，您需要忽略此方法，而选择重写afterReceiveLocation完成后续逻辑
         @Deprecated
-        public void onReceiveLocation(AMapLocation location){
+        protected void onReceiveLocation(AMapLocation location){
             afterReceiveLocation(location);
         }
 
-
+        //该方法在onReceiveLocation调用，重写该方法完成后续逻辑
+        protected abstract void afterReceiveLocation(AMapLocation location);
     }
 
 
