@@ -10,10 +10,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.Projection;
@@ -61,82 +57,82 @@ public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
 
     @Override
     default void setMarks(List<MarkBehavior> list){
-        getMapBuilder().setMarks(list);
+        getMapDelegate().setMarks(list);
     }
 
     @Override
     default void setDifferentMarks(final List<MarkBehavior> list){
-        getMapBuilder().setDifferentMarks(list);
+        getMapDelegate().setDifferentMarks(list);
     }
 
     @Override
     default void removeMarks(final List<Marker> list) {
-        getMapBuilder().removeMarks(list);
+        getMapDelegate().removeMarks(list);
     }
 
     @Override
     default void clearMarkes(){
-        getMapBuilder().clearMarkes();
+        getMapDelegate().clearMarkes();
     }
 
     @Override
     default void clearMap() {
-        getMapBuilder().clearMap();
+        getMapDelegate().clearMap();
     }
 
     @Override
     default void walk(LatLng latLng_from, LatLng latLng_to) {
-        getMapBuilder().walk(latLng_from,latLng_to);
+        getMapDelegate().walk(latLng_from,latLng_to);
     }
 
     @Override
     default void traffic(LatLng latLng_from, LatLng latLng_to, String city) {
-        getMapBuilder().traffic(latLng_from,latLng_to,city);
+        getMapDelegate().traffic(latLng_from,latLng_to,city);
     }
 
     @Override
     default void driver(LatLng latLng_from, LatLng latLng_to) {
-        getMapBuilder().driver(latLng_from,latLng_to);
+        getMapDelegate().driver(latLng_from,latLng_to);
     }
 
     @Override
     default void removeLastRoute() {
-        getMapBuilder().removeLastRoute();
+        getMapDelegate().removeLastRoute();
     }
 
     @Override
     default void hideInfoWindow() {
-        getMapBuilder().hideInfoWindow();
+        getMapDelegate().hideInfoWindow();
     }
 
     @Override
     default void moveMapToArea(double[][] position){
-        getMapBuilder().moveMapToArea(position);
+        getMapDelegate().moveMapToArea(position);
     }
 
     @Override
     default void moveMapToPoint(double lat, double lon){
-        getMapBuilder().moveMapToPoint(lat,lon);
+        getMapDelegate().moveMapToPoint(lat,lon);
     }
 
     @Override
     default void moveMapToLocationPoint(){
-        getMapBuilder().moveMapToLocationPoint();
+        getMapDelegate().moveMapToLocationPoint();
     }
 
     @Override
     default double[][] getMapArea() {
-        return getMapBuilder().getMapArea();
+        return getMapDelegate().getMapArea();
     }
 
     @Override
     default double[] getMapCenter(){
-        return getMapBuilder().getMapCenter();
+        return getMapDelegate().getMapCenter();
     }
 
-    public MapBuilder getMapBuilder();
+    public MapDelegate getMapDelegate();
 
-    public abstract class MapBuilder<T extends AbsMapPresenter> extends AbsViewDelegate<T> implements AbsMapView<T> {
+    public abstract class MapDelegate<T extends AbsMapPresenter> extends AbsViewDelegate<T> implements AbsMapView<T> {
 
         public static int MARKERANIMATE_DURATION = 500;
 
@@ -150,7 +146,7 @@ public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
         public RouteSearch routeSearch;
         public RouteOverlay lastOverlay;
 
-        public MapBuilder(AbsView view) {
+        public MapDelegate(AbsView view) {
             super(view);
         }
 

@@ -20,17 +20,17 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
     @Override
     default void startLocation(){
-        getLocationBuilder().startLocation();
+        getLocationDelegate().startLocation();
     }
 
     @Override
     default AMapLocation getLocation() {
-        return getLocationBuilder().getLocation();
+        return getLocationDelegate().getLocation();
     }
 
-    public LocationBuilder getLocationBuilder();
+    public LocationDelegate getLocationDelegate();
 
-    public abstract class LocationBuilder<T extends AbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
+    public abstract class LocationDelegate<T extends AbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
 
         public AMapLocationClient locationClient;
 
@@ -38,7 +38,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
         public boolean isFirstLocation = true;
 
-        public LocationBuilder(AbsPresenter presenter) {
+        public LocationDelegate(AbsPresenter presenter) {
             super(presenter);
         }
 
@@ -92,7 +92,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
                 public void onLocationChanged(AMapLocation location) {
                     if (location.getErrorCode() == 0)
                     {
-                        LocationBuilder.this.location = location;
+                        LocationDelegate.this.location = location;
 
                         onReceiveLocation(location);
 

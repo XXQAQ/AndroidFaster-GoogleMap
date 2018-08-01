@@ -9,15 +9,15 @@ import com.xq.projectdefine.base.abs.AbsPresenter;
 public interface IBaseMapPresenter<T extends AbsMapView> extends AbsMapPresenter<T>,IBaseLocationPresenter<T> {
 
     @Override
-    default LocationBuilder getLocationBuilder() {
-        return getMapBuilder();
+    default LocationDelegate getLocationDelegate() {
+        return getMapDelegate();
     }
 
-    public MapBuilder getMapBuilder();
+    public MapDelegate getMapDelegate();
 
-    public abstract class MapBuilder<T extends AbsMapView> extends LocationBuilder<T> implements AbsMapPresenter<T>{
+    public abstract class MapDelegate<T extends AbsMapView> extends LocationDelegate<T> implements AbsMapPresenter<T>{
 
-        public MapBuilder(AbsPresenter presenter) {
+        public MapDelegate(AbsPresenter presenter) {
             super(presenter);
         }
 
