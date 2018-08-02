@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
-public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
+public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T> {
 
     @Override
     default void setMarks(List<MarkBehavior> list){
@@ -132,7 +132,7 @@ public interface IBaseMapView<T extends AbsMapPresenter> extends AbsMapView<T> {
 
     public MapDelegate getMapDelegate();
 
-    public abstract class MapDelegate<T extends AbsMapPresenter> extends AbsViewDelegate<T> implements AbsMapView<T> {
+    public abstract class MapDelegate<T extends IBaseMapPresenter> extends AbsViewDelegate<T> implements AbsMapView<T> {
 
         public static int MARKERANIMATE_DURATION = 500;
 
