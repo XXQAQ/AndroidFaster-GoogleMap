@@ -1,7 +1,7 @@
 package com.xq.androidfaster_amap.basemap;
 
 
-import com.amap.api.location.AMapLocation;
+import android.location.Location;
 import com.xq.androidfaster_amap.baselocation.IBaseLocationPresenter;
 import com.xq.projectdefine.base.abs.AbsPresenter;
 
@@ -22,7 +22,7 @@ public interface IBaseMapPresenter<T extends IBaseMapView> extends AbsMapPresent
         }
 
         @Override
-        public void onReceiveLocation(AMapLocation location) {
+        public void onReceiveLocation(Location location) {
             super.onReceiveLocation(getLocation());
 
             if (isFirstLocation)

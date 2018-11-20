@@ -1,8 +1,6 @@
 package com.xq.androidfaster_amap.basemap;
 
 
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.Marker;
 import com.xq.androidfaster_amap.bean.behavior.MarkBehavior;
 import com.xq.projectdefine.base.abs.AbsView;
 import java.util.List;
@@ -16,7 +14,7 @@ public interface AbsMapView<T extends AbsMapPresenter> extends AbsView<T> {
     public void setDifferentMarks(final List<MarkBehavior> list);
 
     //删除指定Markes
-    public void removeMarks(final List<Marker> list);
+    public void removeMarks(final List<MarkBehavior> list);
 
     //清空所有Marker
     public void clearMarkes();
@@ -25,13 +23,13 @@ public interface AbsMapView<T extends AbsMapPresenter> extends AbsView<T> {
     public void clearMap();
 
     //步行路线规划
-    public void walk(LatLng latLng_from, LatLng latLng_to);
+    public void walk(double[][] position);
 
     //交通路线规划
-    public void traffic(LatLng latLng_from, LatLng latLng_to, String city);
+    public void traffic(double[][] position, String city);
 
     //驾车路线规划
-    public void driver(LatLng latLng_from, LatLng latLng_to);
+    public void driver(double[][] position);
 
     //清除上次路线规划
     public void removeLastRoute();

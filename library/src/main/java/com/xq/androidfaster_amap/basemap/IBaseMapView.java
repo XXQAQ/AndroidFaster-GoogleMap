@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
-
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.Projection;
@@ -46,7 +45,6 @@ import com.xq.androidfaster_amap.util.overlay.RouteOverlay;
 import com.xq.androidfaster_amap.util.overlay.WalkRouteOverlay;
 import com.xq.projectdefine.base.abs.AbsView;
 import com.xq.projectdefine.base.abs.AbsViewDelegate;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +64,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
     }
 
     @Override
-    default void removeMarks(final List<Marker> list) {
+    default void removeMarks(final List<MarkBehavior> list) {
         getMapDelegate().removeMarks(list);
     }
 
@@ -81,18 +79,18 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
     }
 
     @Override
-    default void walk(LatLng latLng_from, LatLng latLng_to) {
-        getMapDelegate().walk(latLng_from,latLng_to);
+    default void walk(double[][] position) {
+        getMapDelegate().walk(position);
     }
 
     @Override
-    default void traffic(LatLng latLng_from, LatLng latLng_to, String city) {
-        getMapDelegate().traffic(latLng_from,latLng_to,city);
+    default void traffic(double[][] position, String city) {
+        getMapDelegate().traffic(position,city);
     }
 
     @Override
-    default void driver(LatLng latLng_from, LatLng latLng_to) {
-        getMapDelegate().driver(latLng_from,latLng_to);
+    default void driver(double[][] position) {
+        getMapDelegate().driver(position);
     }
 
     @Override
@@ -375,9 +373,9 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         @Override
         public void setDifferentMarks(final List<MarkBehavior> list){
 
-            final List<MarkBehavior> list_newMarkBehavior = new LinkedList<>();
+            final List<MarkBehavior> list_new = new LinkedList<>();
             final List<MarkBehavior> list_newCopy = new LinkedList<>();
-            final List<Marker> list_removeMarker = new LinkedList<>();
+            final List<MarkBehavior> list_remove = new LinkedList<>();
 
             //遍历所有旧Marker，当发现旧marker在新集合中不存在的时候，则在原集合中删除且标记到删除集合中
             for (Marker marker : list_marker)
@@ -385,11 +383,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                 MarkBehavior markBehavior = (MarkBehavior) marker.getObject();
                 if (!list.contains(markBehavior))
                 {
-                    list_removeMarker.add(marker);
+                    list_remove.add(markBehavior);
                 }
             }
 
-            removeMarks(list_removeMarker);
+            removeMarks(list_remove);
 
             for (Marker marker : list_marker)
             {
@@ -402,15 +400,31 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             {
                 if (!list_newCopy.contains(new_markBehavior))
                 {
-                    list_newMarkBehavior.add(new_markBehavior);
+                    list_new.add(new_markBehavior);
                 }
             }
 
-            setMarks(list_newMarkBehavior);
+            setMarks(list_new);
         }
 
         @Override
-        public void removeMarks(final List<Marker> list) {
+        public void removeMarks(final List<MarkBehavior> list) {
+
+            List<Marker> list_remove = new LinkedList();
+            for (Marker marker : list_marker)
+            {
+                if (list.contains(marker.getObject()))
+                    list_remove.add(marker);
+            }
+            reallyRemoveMarks(list_remove);
+        }
+
+        @Override
+        public void clearMarkes(){
+            reallyRemoveMarks(list_marker);
+        }
+
+        protected void reallyRemoveMarks(final List<Marker> list) {
 
             for (Marker marker : list)
             {
@@ -435,11 +449,6 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         @Override
-        public void clearMarkes(){
-            removeMarks(list_marker);
-        }
-
-        @Override
         public void clearMap() {
             map.clear(true);
             lastMarker = null;
@@ -447,20 +456,20 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         @Override
-        public void walk(LatLng latLng_from, LatLng latLng_to) {
-            RouteSearch.WalkRouteQuery query = new RouteSearch.WalkRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(latLng_from.latitude,latLng_from.longitude),new LatLonPoint(latLng_to.latitude,latLng_to.longitude)));
+        public void walk(double[][] position) {
+            RouteSearch.WalkRouteQuery query = new RouteSearch.WalkRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(position[0][0],position[0][1]),new LatLonPoint(position[1][0],position[1][1])));
             routeSearch.calculateWalkRouteAsyn(query);
         }
 
         @Override
-        public void traffic(LatLng latLng_from, LatLng latLng_to, String city) {
-            RouteSearch.BusRouteQuery query = new RouteSearch.BusRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(latLng_from.latitude,latLng_from.longitude),new LatLonPoint(latLng_to.latitude,latLng_to.longitude)), RouteSearch.BUS_DEFAULT, city,1);
+        public void traffic(double[][] position,String city) {
+            RouteSearch.BusRouteQuery query = new RouteSearch.BusRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(position[0][0],position[0][1]),new LatLonPoint(position[1][0],position[1][1])), RouteSearch.BUS_DEFAULT, city,1);
             routeSearch.calculateBusRouteAsyn(query);
         }
 
         @Override
-        public void driver(LatLng latLng_from, LatLng latLng_to) {
-            RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(latLng_from.latitude,latLng_from.longitude),new LatLonPoint(latLng_to.latitude,latLng_to.longitude)), RouteSearch.WALK_DEFAULT, null, null, "");
+        public void driver(double[][] position) {
+            RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(position[0][0],position[0][1]),new LatLonPoint(position[1][0],position[1][1])), RouteSearch.WALK_DEFAULT, null, null, "");
             routeSearch.calculateDriveRouteAsyn(query);
         }
 

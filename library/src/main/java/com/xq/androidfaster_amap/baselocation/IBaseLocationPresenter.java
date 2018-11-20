@@ -1,8 +1,8 @@
 package com.xq.androidfaster_amap.baselocation;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
-
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -24,7 +24,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
     }
 
     @Override
-    default AMapLocation getLocation() {
+    default Location getLocation() {
         return getLocationDelegate().getLocation();
     }
 
@@ -34,7 +34,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
         public AMapLocationClient locationClient;
 
-        public AMapLocation location;
+        public Location location;
 
         public boolean isFirstLocation = true;
 
@@ -111,18 +111,18 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
         }
 
         //获取定位
-        public AMapLocation getLocation() {
+        public Location getLocation() {
             return location;
         }
 
         //该方法在接收到定位数据后调用，您需要忽略此方法，而选择重写afterReceiveLocation完成后续逻辑
         @Deprecated
-        protected void onReceiveLocation(AMapLocation location){
+        protected void onReceiveLocation(Location location){
             afterReceiveLocation(location);
         }
 
         //该方法在onReceiveLocation调用，重写该方法完成后续逻辑
-        protected abstract void afterReceiveLocation(AMapLocation location);
+        protected abstract void afterReceiveLocation(Location location);
     }
 
 
