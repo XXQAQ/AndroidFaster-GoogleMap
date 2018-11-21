@@ -3,14 +3,12 @@ package com.xq.androidfaster_amap.util.eventbus;
 
 import android.location.Location;
 
-import com.amap.api.location.AMapLocation;
-
 
 public class LocationEvent {
 
     private Location location;
 
-    public LocationEvent(AMapLocation location) {
+    public LocationEvent(Location location) {
         this.location = location;
     }
 
@@ -18,7 +16,7 @@ public class LocationEvent {
         return location;
     }
 
-    public void setLocation(AMapLocation location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 }
