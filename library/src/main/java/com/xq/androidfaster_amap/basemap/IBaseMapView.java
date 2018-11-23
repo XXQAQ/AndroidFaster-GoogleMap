@@ -1,48 +1,31 @@
 package com.xq.androidfaster_amap.basemap;
 
 
-import android.graphics.Color;
+import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.widget.Toast;
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.Projection;
-import com.amap.api.maps.TextureMapView;
-import com.amap.api.maps.model.BitmapDescriptor;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
-import com.amap.api.maps.model.CameraPosition;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.LatLngBounds;
-import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
-import com.amap.api.maps.model.MyLocationStyle;
-import com.amap.api.maps.model.animation.AlphaAnimation;
-import com.amap.api.maps.model.animation.Animation;
-import com.amap.api.maps.model.animation.ScaleAnimation;
-import com.amap.api.services.core.AMapException;
-import com.amap.api.services.core.LatLonPoint;
-import com.amap.api.services.route.BusPath;
-import com.amap.api.services.route.BusRouteResult;
-import com.amap.api.services.route.DrivePath;
-import com.amap.api.services.route.DriveRouteResult;
-import com.amap.api.services.route.Path;
-import com.amap.api.services.route.RidePath;
-import com.amap.api.services.route.RideRouteResult;
-import com.amap.api.services.route.RouteResult;
-import com.amap.api.services.route.RouteSearch;
-import com.amap.api.services.route.WalkPath;
-import com.amap.api.services.route.WalkRouteResult;
+import com.directions.route.AbstractRouting;
+import com.directions.route.Route;
+import com.directions.route.RouteException;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.xq.androidfaster_amap.R;
 import com.xq.androidfaster_amap.bean.behavior.MarkBehavior;
-import com.xq.androidfaster_amap.util.overlay.BusRouteOverlay;
-import com.xq.androidfaster_amap.util.overlay.DrivingRouteOverlay;
-import com.xq.androidfaster_amap.util.overlay.RideRouteOverlay;
-import com.xq.androidfaster_amap.util.overlay.RouteOverlay;
-import com.xq.androidfaster_amap.util.overlay.WalkRouteOverlay;
+import com.xq.androidfaster_amap.util.MapUtils;
 import com.xq.projectdefine.base.abs.AbsView;
 import com.xq.projectdefine.base.abs.AbsViewDelegate;
 import java.util.ArrayList;
@@ -134,15 +117,14 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         public static int MARKERANIMATE_DURATION = 500;
 
-        public TextureMapView mapView ;
+        public MapView mapView ;
 
-        public AMap map;
+        public GoogleMap map;
 
         public CopyOnWriteArrayList<Marker> list_marker = new CopyOnWriteArrayList<>();
         public Marker lastMarker;
 
-        public RouteSearch routeSearch;
-        public RouteOverlay lastOverlay;
+        public Polyline lastOverlay;
 
         public MapDelegate(AbsView view) {
             super(view);
@@ -174,168 +156,62 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         protected void initMapView(Bundle savedInstanceState){
-            mapView = (TextureMapView) getRootView().findViewById(getContext().getResources().getIdentifier("mapView", "id", getContext().getPackageName()));
+            mapView = (MapView) getRootView().findViewById(getContext().getResources().getIdentifier("mapView", "id", getContext().getPackageName()));
 
             mapView.onCreate(savedInstanceState);
 
-            map = mapView.getMap();
-
-            //定位点初始化
-            MyLocationStyle myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
-            myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromResource(getLocationIcon()));
-            myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
-            myLocationStyle.interval(1000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-            myLocationStyle.strokeColor(Color.TRANSPARENT);// 设置圆形的边框颜色
-            myLocationStyle.radiusFillColor(getLocationRadiusColor());// 设置圆形的填充颜色
-            map.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
-            map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
-
-            //map相关设置
-            AMap.InfoWindowAdapter adapter = new AMap.ImageInfoWindowAdapter() {
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @SuppressLint("MissingPermission")
                 @Override
-                public long getInfoWindowUpdateTime() {
-                    return 0;
-                }
+                public void onMapReady(GoogleMap googleMap) {
+                    map = googleMap;
 
-                @Override
-                public View getInfoWindow(Marker marker) {
-                    MarkBehavior behavior = (MarkBehavior) marker.getObject();
-                    return getWindowView(behavior);
-                }
+                    map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
 
-                @Override
-                public View getInfoContents(Marker marker) {
-                    return null;
-                }
-            };
-            map.setInfoWindowAdapter(adapter);
-
-
-            //map相关监听
-            map.setOnMapClickListener(new AMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(LatLng latLng) {
-                    afterMapClick(latLng.latitude,latLng.longitude);
-                }
-            });
-
-            map.setOnMarkerClickListener(new AMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-
-                    lastMarker = marker;
-
-                    afterMarkerClick(marker);
-
-                    marker.showInfoWindow();
-
-                    return true;
-                }
-            });
-
-            map.setOnCameraChangeListener(new AMap.OnCameraChangeListener() {
-                @Override
-                public void onCameraChange(CameraPosition cameraPosition) {
-
-                }
-
-                @Override
-                public void onCameraChangeFinish(CameraPosition cameraPosition) {
-                    afterMapStatusChangeFinish(cameraPosition);
-                }
-            });
-
-            routeSearch = new RouteSearch(getContext());
-            routeSearch.setRouteSearchListener(new RouteSearch.OnRouteSearchListener() {
-                @Override
-                public void onBusRouteSearched(BusRouteResult result, int errorCode) {
-                    myRouteSearch(result,errorCode);
-                }
-
-                @Override
-                public void onDriveRouteSearched(DriveRouteResult result, int errorCode) {
-                    myRouteSearch(result,errorCode);
-                }
-
-                @Override
-                public void onWalkRouteSearched(WalkRouteResult result, int errorCode) {
-                    myRouteSearch(result,errorCode);
-                }
-
-                @Override
-                public void onRideRouteSearched(RideRouteResult result, int errorCode) {
-                    myRouteSearch(result,errorCode);
-                }
-
-                public void myRouteSearch(RouteResult result, int errorCode){
-
-                    List list_path = null;
-                    if (result instanceof WalkRouteResult)
-                    {
-                        list_path = ((WalkRouteResult) result).getPaths();
-                    }
-                    else    if (result instanceof BusRouteResult)
-                    {
-                        list_path = ((BusRouteResult) result).getPaths();
-                    }
-                    else    if (result instanceof DriveRouteResult)
-                    {
-                        list_path = ((DriveRouteResult) result).getPaths();
-                    }
-                    else    if (result instanceof RideRouteResult)
-                    {
-                        list_path = ((RideRouteResult) result).getPaths();
-                    }
-
-                    if (errorCode == AMapException.CODE_AMAP_SUCCESS)
-                    {
-                        if (result != null && list_path != null)
-                        {
-                            if (list_path.size() > 0)
-                            {
-                                final Path path = (Path) list_path.get(0);
-
-                                RouteOverlay overlay = null;
-                                if (result instanceof WalkRouteResult)
-                                {
-                                    overlay = new WalkRouteOverlay(getContext(), map, (WalkPath) path, result.getStartPos(), result.getTargetPos());
-                                }
-                                else    if (result instanceof BusRouteResult)
-                                {
-                                    overlay = new BusRouteOverlay(getContext(), map, (BusPath) path, result.getStartPos(), result.getTargetPos());
-                                }
-                                else    if (result instanceof DriveRouteResult)
-                                {
-                                    overlay = new DrivingRouteOverlay(getContext(), map, (DrivePath) path, result.getStartPos(), result.getTargetPos(),null);
-                                }
-                                else    if (result instanceof RideRouteResult)
-                                {
-                                    overlay = new RideRouteOverlay(getContext(), map, (RidePath) path, result.getStartPos(), result.getTargetPos());
-                                }
-
-                                overlay.removeFromMap();
-                                overlay.addToMap();
-                                overlay.zoomToSpan();
-
-                                lastOverlay = overlay;
-
-                            }
-                            else    if (result != null && list_path == null)
-                            {
-                                Toast.makeText(getContext(),"无路线规划结果",Toast.LENGTH_SHORT).show();
-                            }
+                    //map相关设置
+                    GoogleMap.InfoWindowAdapter adapter = new GoogleMap.InfoWindowAdapter() {
+                        @Override
+                        public View getInfoWindow(Marker marker) {
+                            MarkBehavior behavior = (MarkBehavior) marker.getTag();
+                            return getWindowView(behavior);
                         }
-                        else
-                        {
-                            Toast.makeText(getContext(),"无路线规划结果",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else
-                    {
-                        Toast.makeText(getContext(),"路线规划失败",Toast.LENGTH_SHORT).show();
-                    }
 
-                    afterGetRouteFinish(result,errorCode);
+                        @Override
+                        public View getInfoContents(Marker marker) {
+                            return null;
+                        }
+                    };
+                    map.setInfoWindowAdapter(adapter);
+
+
+                    //map相关监听
+                    map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                        @Override
+                        public void onMapClick(LatLng latLng) {
+                            afterMapClick(latLng.latitude,latLng.longitude);
+                        }
+                    });
+
+                    map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+
+                            lastMarker = marker;
+
+                            afterMarkerClick(marker);
+
+                            marker.showInfoWindow();
+
+                            return true;
+                        }
+                    });
+
+                    map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition) {
+                            afterMapStatusChangeFinish(cameraPosition);
+                        }
+                    });
                 }
             });
         }
@@ -348,21 +224,20 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             for (MarkBehavior behavior : list)
             {
                 MarkerOptions markerOption = new MarkerOptions();
-                markerOption.period(200);
                 markerOption.position(new LatLng(behavior.getLatitude(),behavior.getLongitude()));
                 markerOption.title(behavior.getTitle()).snippet(behavior.getLittleTitle());
                 markerOption.draggable(false);//设置Marker可拖动
-                markerOption.icons(getMarkerDescript(behavior));
-                markerOption.setFlat(false);//设置marker平贴地图效果
+                markerOption.icon(getMarkerDescript(behavior));
+//                markerOption.setFlat(false);//设置marker平贴地图效果
 
                 Marker marker = map.addMarker(markerOption);
-                marker.setObject(behavior);
+                marker.setTag(behavior);
 
-                Animation animation = new ScaleAnimation(0,1,0,1);
-                animation.setDuration(MARKERANIMATE_DURATION);
-                animation.setInterpolator(new AccelerateInterpolator());
-                marker.setAnimation(animation);
-                marker.startAnimation();
+//                Animation animation = new ScaleAnimation(0,1,0,1);
+//                animation.setDuration(MARKERANIMATE_DURATION);
+//                animation.setInterpolator(new AccelerateInterpolator());
+//                marker.setAnimation(animation);
+//                marker.startAnimation();
 
                 list_mark.add(marker);
             }
@@ -380,7 +255,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             //遍历所有旧Marker，当发现旧marker在新集合中不存在的时候，则在原集合中删除且标记到删除集合中
             for (Marker marker : list_marker)
             {
-                MarkBehavior markBehavior = (MarkBehavior) marker.getObject();
+                MarkBehavior markBehavior = (MarkBehavior) marker.getTag();
                 if (!list.contains(markBehavior))
                 {
                     list_remove.add(markBehavior);
@@ -391,7 +266,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
             for (Marker marker : list_marker)
             {
-                MarkBehavior markBehavior = (MarkBehavior) marker.getObject();
+                MarkBehavior markBehavior = (MarkBehavior) marker.getTag();
                 list_newCopy.add(markBehavior);
             }
 
@@ -413,7 +288,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             List<Marker> list_remove = new LinkedList();
             for (Marker marker : list_marker)
             {
-                if (list.contains(marker.getObject()))
+                if (list.contains(marker.getTag()))
                     list_remove.add(marker);
             }
             reallyRemoveMarks(list_remove);
@@ -426,14 +301,14 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         protected void reallyRemoveMarks(final List<Marker> list) {
 
-            for (Marker marker : list)
-            {
-                Animation animation = new AlphaAnimation(1,0);
-                animation.setDuration(MARKERANIMATE_DURATION);
-                animation.setInterpolator(new LinearInterpolator());
-                marker.setAnimation(animation);
-                marker.startAnimation();
-            }
+//            for (Marker marker : list)
+//            {
+//                Animation animation = new AlphaAnimation(1,0);
+//                animation.setDuration(MARKERANIMATE_DURATION);
+//                animation.setInterpolator(new LinearInterpolator());
+//                marker.setAnimation(animation);
+//                marker.startAnimation();
+//            }
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -450,34 +325,68 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         @Override
         public void clearMap() {
-            map.clear(true);
+            map.clear();
+            MapUtils.removeRoutePolyLine(lastOverlay);
             lastMarker = null;
             list_marker.clear();
         }
 
         @Override
         public void walk(double[][] position) {
-            RouteSearch.WalkRouteQuery query = new RouteSearch.WalkRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(position[0][0],position[0][1]),new LatLonPoint(position[1][0],position[1][1])));
-            routeSearch.calculateWalkRouteAsyn(query);
+            commonRouting(AbstractRouting.TravelMode.WALKING,position);
         }
 
         @Override
         public void traffic(double[][] position,String city) {
-            RouteSearch.BusRouteQuery query = new RouteSearch.BusRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(position[0][0],position[0][1]),new LatLonPoint(position[1][0],position[1][1])), RouteSearch.BUS_DEFAULT, city,1);
-            routeSearch.calculateBusRouteAsyn(query);
+            commonRouting(AbstractRouting.TravelMode.TRANSIT,position);
         }
 
         @Override
         public void driver(double[][] position) {
-            RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(new RouteSearch.FromAndTo(new LatLonPoint(position[0][0],position[0][1]),new LatLonPoint(position[1][0],position[1][1])), RouteSearch.WALK_DEFAULT, null, null, "");
-            routeSearch.calculateDriveRouteAsyn(query);
+            commonRouting(AbstractRouting.TravelMode.DRIVING,position);
+        }
+
+        private void commonRouting(AbstractRouting.TravelMode travelMode,double[][] position){
+            Routing routing = new Routing.Builder()
+                    .travelMode(travelMode)
+                    .withListener(new RoutingListener() {
+                        @Override
+                        public void onRoutingFailure(RouteException e) {
+                            afterGetRouteFinish(null,-1);
+                        }
+
+                        @Override
+                        public void onRoutingStart() {
+
+                        }
+
+                        @Override
+                        public void onRoutingSuccess(ArrayList<Route> arrayList, int i) {
+                            MapUtils.removeRoutePolyLine(lastOverlay);
+                            Polyline polyline = map.addPolyline(MapUtils.addRoutePolyLine(arrayList, getColor(R.color.polyline)));
+                            MapUtils.moveMapToPolyline(getContext(),map,polyline);
+
+                            lastOverlay = polyline;
+
+                            afterGetRouteFinish(arrayList,i);
+                        }
+
+                        @Override
+                        public void onRoutingCancelled() {
+
+                        }
+                    })
+                    .alternativeRoutes(false)
+                    .waypoints(new LatLng(position[0][0],position[0][1]), new LatLng(position[1][0],position[1][1]))
+                    .build();
+            routing.execute();
         }
 
         @Override
         public void removeLastRoute() {
             if (lastOverlay != null)
             {
-                lastOverlay.removeFromMap();
+                MapUtils.removeRoutePolyLine(lastOverlay);
                 lastOverlay = null;
             }
         }
@@ -497,12 +406,12 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             for(int i=0;i<position.length;i++)
                 boundsBuilder.include(new LatLng(position[i][0],position[i][1]));
 
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds( boundsBuilder.build(),18));
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds( boundsBuilder.build(),15));
         }
 
         @Override
         public void moveMapToPoint(double lat, double lon){
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),18));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),15));
         }
 
         @Override
@@ -545,7 +454,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         protected abstract int getLocationRadiusColor();
 
         //重写该方法返回Marker样式
-        protected abstract ArrayList<BitmapDescriptor> getMarkerDescript(MarkBehavior behavior);
+        protected abstract BitmapDescriptor getMarkerDescript(MarkBehavior behavior);
 
         //重写该方法返回弹窗样式
         protected abstract View getWindowView(MarkBehavior behavior);
@@ -560,7 +469,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         protected abstract void afterMapClick(double lat,double lon);
 
         //路线规划结束后调用
-        protected abstract void afterGetRouteFinish(RouteResult result, int erroCode);
+        protected abstract void afterGetRouteFinish(ArrayList<Route> result, int erroCode);
 
     }
 

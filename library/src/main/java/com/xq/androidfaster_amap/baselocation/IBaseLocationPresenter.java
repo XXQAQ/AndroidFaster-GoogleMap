@@ -1,12 +1,16 @@
 package com.xq.androidfaster_amap.baselocation;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.xq.projectdefine.FasterInterface;
 import com.xq.projectdefine.base.abs.AbsPresenter;
 import com.xq.projectdefine.base.abs.AbsPresenterDelegate;
@@ -32,7 +36,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
     public abstract class LocationDelegate<T extends AbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
 
-        public AMapLocationClient locationClient;
+        public GoogleApiClient locationClient;
 
         public Location location;
 
@@ -75,7 +79,7 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
         @Override
         public void onDestroy() {
             if (locationClient != null)
-                locationClient.onDestroy();
+                locationClient.disconnect();
         }
 
         @Override
@@ -86,28 +90,42 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
         //开始定位
         public void startLocation(){
             //定位
-            locationClient = new AMapLocationClient(FasterInterface.getApp());
-            locationClient.setLocationListener(new AMapLocationListener() {
-                @Override
-                public void onLocationChanged(AMapLocation location) {
-                    if (location.getErrorCode() == 0)
-                    {
-                        LocationDelegate.this.location = location;
+            locationClient = new GoogleApiClient.Builder(getContext())
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @SuppressLint("MissingPermission")
+                        @Override
+                        public void onConnected(@Nullable Bundle bundle) {
+                            LocationRequest mLocationRequest = LocationRequest.create();
+                            mLocationRequest.setInterval(2000);
+                            mLocationRequest.setFastestInterval(1000);
+                            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                            LocationServices.FusedLocationApi.requestLocationUpdates(locationClient, mLocationRequest, new LocationListener() {
+                                @Override
+                                public void onLocationChanged(Location location) {
+                                    LocationDelegate.this.location = location;
 
-                        onReceiveLocation(location);
+                                    onReceiveLocation(location);
 
-                        if (isFirstLocation)
-                            isFirstLocation = false;
-                    }
-                }
-            });
-            AMapLocationClientOption clientOption = new AMapLocationClientOption();
-            clientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-            clientOption.setInterval(1000);
-            clientOption.setNeedAddress(true);
-            clientOption.setMockEnable(true);
-            locationClient.setLocationOption(clientOption);
-            locationClient.startLocation();
+                                    if (isFirstLocation)
+                                        isFirstLocation = false;
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                        }
+                    })
+                    .addApi(LocationServices.API)
+                    .build();
+            locationClient.connect();
         }
 
         //获取定位
