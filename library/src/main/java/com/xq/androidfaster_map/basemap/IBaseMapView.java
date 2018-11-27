@@ -140,7 +140,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     map = googleMap;
-                    initMapView(null);
+                    initMapView();
                 }
             });
         }
@@ -170,7 +170,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         @SuppressLint("MissingPermission")
-        protected void initMapView(Bundle savedInstanceState){
+        protected void initMapView(){
 
             map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
 
