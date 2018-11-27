@@ -479,6 +479,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         //点击地图后调用
         protected abstract void afterMapClick(double lat,double lon);
 
+        //长按地图后调用
         protected abstract void afterMapLongClick(double lat,double lon);
 
         //路线规划结束后调用
