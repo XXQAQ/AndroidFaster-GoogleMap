@@ -90,8 +90,8 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
     }
 
     @Override
-    default void moveMapToPoint(double lat, double lon){
-        getMapDelegate().moveMapToPoint(lat,lon);
+    default void moveMapToPoint(double[] poition){
+        getMapDelegate().moveMapToPoint(poition);
     }
 
     @Override
@@ -421,16 +421,15 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         @Override
-        public void moveMapToPoint(double lat, double lon){
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),15));
+        public void moveMapToPoint(double[] position){
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(position[0],position[1]),15));
         }
 
         @Override
         public void moveMapToLocationPoint(){
-
             if (getPresenter().getLocation() != null)
             {
-                moveMapToPoint(getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude());
+                moveMapToPoint(new double[]{getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude()});
             }
             else
             {

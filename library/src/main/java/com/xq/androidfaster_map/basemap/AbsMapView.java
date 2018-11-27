@@ -40,7 +40,7 @@ public interface AbsMapView<T extends AbsMapPresenter> extends IAbsView<T> {
     public void moveMapToArea(double[][] position);
 
     //移动地图至某点
-    public void moveMapToPoint(double lat, double lon);
+    public void moveMapToPoint(double[] position);
 
     //移动地图至当前位置
     public void moveMapToLocationPoint();
