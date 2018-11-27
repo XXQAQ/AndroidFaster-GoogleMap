@@ -131,7 +131,18 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         @Override
         public void afterOnCreate(Bundle savedInstanceState) {
             super.afterOnCreate(savedInstanceState);
-            initMapView(savedInstanceState);
+
+            mapView = (MapView) getRootView().findViewById(getContext().getResources().getIdentifier("mapView", "id", getContext().getPackageName()));
+
+            mapView.onCreate(savedInstanceState);
+
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    map = googleMap;
+                    initMapView(null);
+                }
+            });
         }
 
         @Override
@@ -158,64 +169,53 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             mapView.onSaveInstanceState(outState);
         }
 
+        @SuppressLint("MissingPermission")
         protected void initMapView(Bundle savedInstanceState){
-            mapView = (MapView) getRootView().findViewById(getContext().getResources().getIdentifier("mapView", "id", getContext().getPackageName()));
 
-            mapView.onCreate(savedInstanceState);
+            map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
 
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @SuppressLint("MissingPermission")
+            //map相关设置
+            GoogleMap.InfoWindowAdapter adapter = new GoogleMap.InfoWindowAdapter() {
                 @Override
-                public void onMapReady(GoogleMap googleMap) {
+                public View getInfoWindow(Marker marker) {
+                    MarkBehavior behavior = (MarkBehavior) marker.getTag();
+                    return getWindowView(behavior);
+                }
 
-                    map = googleMap;
-
-                    map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
-
-                    //map相关设置
-                    GoogleMap.InfoWindowAdapter adapter = new GoogleMap.InfoWindowAdapter() {
-                        @Override
-                        public View getInfoWindow(Marker marker) {
-                            MarkBehavior behavior = (MarkBehavior) marker.getTag();
-                            return getWindowView(behavior);
-                        }
-
-                        @Override
-                        public View getInfoContents(Marker marker) {
-                            return null;
-                        }
-                    };
-                    map.setInfoWindowAdapter(adapter);
+                @Override
+                public View getInfoContents(Marker marker) {
+                    return null;
+                }
+            };
+            map.setInfoWindowAdapter(adapter);
 
 
-                    //map相关监听
-                    map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                        @Override
-                        public void onMapClick(LatLng latLng) {
-                            afterMapClick(latLng.latitude,latLng.longitude);
-                        }
-                    });
+            //map相关监听
+            map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    afterMapClick(latLng.latitude,latLng.longitude);
+                }
+            });
 
-                    map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                        @Override
-                        public boolean onMarkerClick(Marker marker) {
+            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
 
-                            lastMarker = marker;
+                    lastMarker = marker;
 
-                            afterMarkerClick(marker);
+                    afterMarkerClick(marker);
 
-                            marker.showInfoWindow();
+                    marker.showInfoWindow();
 
-                            return true;
-                        }
-                    });
+                    return true;
+                }
+            });
 
-                    map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                        @Override
-                        public void onCameraChange(CameraPosition cameraPosition) {
-                            afterMapStatusChangeFinish(cameraPosition);
-                        }
-                    });
+            map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                @Override
+                public void onCameraChange(CameraPosition cameraPosition) {
+                    afterMapStatusChangeFinish(cameraPosition);
                 }
             });
         }
