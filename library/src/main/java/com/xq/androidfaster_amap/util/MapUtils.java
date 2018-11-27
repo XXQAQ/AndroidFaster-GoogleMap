@@ -1,7 +1,6 @@
 package com.xq.androidfaster_amap.util;
 
 import android.content.Context;
-
 import com.directions.route.Route;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -10,8 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.xq.projectdefine.util.tools.ScreenUtils;
-
+import com.xq.androidfaster.util.tools.ScreenUtils;
 import java.util.ArrayList;
 import java.util.List;
 

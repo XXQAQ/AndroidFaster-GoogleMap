@@ -1,10 +1,9 @@
 package com.xq.androidfaster_amap.basemap;
 
-
 import android.location.Location;
-import com.xq.androidfaster_amap.baselocation.IBaseLocationPresenter;
-import com.xq.projectdefine.base.abs.AbsPresenter;
 
+import com.xq.androidfaster.base.abs.IAbsPresenter;
+import com.xq.androidfaster_amap.baselocation.IBaseLocationPresenter;
 
 public interface IBaseMapPresenter<T extends IBaseMapView> extends AbsMapPresenter<T>,IBaseLocationPresenter<T> {
 
@@ -17,7 +16,7 @@ public interface IBaseMapPresenter<T extends IBaseMapView> extends AbsMapPresent
 
     public abstract class MapDelegate<T extends IBaseMapView> extends LocationDelegate<T> implements AbsMapPresenter<T>{
 
-        public MapDelegate(AbsPresenter presenter) {
+        public MapDelegate(IAbsPresenter presenter) {
             super(presenter);
         }
 

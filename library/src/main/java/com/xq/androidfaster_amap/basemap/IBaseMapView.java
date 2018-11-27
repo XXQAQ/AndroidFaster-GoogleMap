@@ -1,6 +1,5 @@
 package com.xq.androidfaster_amap.basemap;
 
-
 import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -23,16 +22,15 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.xq.androidfaster.base.abs.AbsViewDelegate;
+import com.xq.androidfaster.base.abs.IAbsView;
 import com.xq.androidfaster_amap.R;
 import com.xq.androidfaster_amap.bean.behavior.MarkBehavior;
 import com.xq.androidfaster_amap.util.MapUtils;
-import com.xq.projectdefine.base.abs.AbsView;
-import com.xq.projectdefine.base.abs.AbsViewDelegate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 
 public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T> {
 
@@ -126,32 +124,37 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         public Polyline lastOverlay;
 
-        public MapDelegate(AbsView view) {
+        public MapDelegate(IAbsView view) {
             super(view);
         }
 
         @Override
         public void afterOnCreate(Bundle savedInstanceState) {
+            super.afterOnCreate(savedInstanceState);
             initMapView(savedInstanceState);
         }
 
         @Override
         public void onResume() {
+            super.onResume();
             mapView.onResume();
         }
 
         @Override
         public void onPause() {
+            super.onPause();
             mapView.onPause();
         }
 
         @Override
         public void onDestroy() {
+            super.onDestroy();
             mapView.onDestroy();
         }
 
         @Override
         public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
             mapView.onSaveInstanceState(outState);
         }
 
@@ -164,6 +167,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                 @SuppressLint("MissingPermission")
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
+
                     map = googleMap;
 
                     map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。

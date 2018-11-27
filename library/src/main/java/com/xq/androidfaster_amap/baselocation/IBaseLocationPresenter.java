@@ -1,30 +1,37 @@
 package com.xq.androidfaster_amap.baselocation;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.xq.projectdefine.FasterInterface;
-import com.xq.projectdefine.base.abs.AbsPresenter;
-import com.xq.projectdefine.base.abs.AbsPresenterDelegate;
-import com.xq.projectdefine.base.abs.AbsView;
-import com.xq.projectdefine.util.constant.PermissionConstants;
-import com.xq.projectdefine.util.tools.PermissionUtils;
-
+import com.xq.androidfaster.FasterInterface;
+import com.xq.androidfaster.base.abs.AbsPresenterDelegate;
+import com.xq.androidfaster.base.abs.IAbsPresenter;
+import com.xq.androidfaster.base.abs.IAbsView;
+import com.xq.androidfaster.util.constant.PermissionConstants;
+import com.xq.androidfaster.util.tools.BundleUtil;
+import com.xq.androidfaster.util.tools.PermissionUtils;
+import com.xq.androidfaster_amap.service.BaseLocationService;
 import java.util.List;
 
-public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPresenter<T>{
+import static com.xq.androidfaster_amap.service.BaseLocationService.ACTION_LOCATION;
+
+public interface IBaseLocationPresenter<T extends IAbsView> extends AbsLocationPresenter<T>{
 
     @Override
-    default void startLocation(){
-        getLocationDelegate().startLocation();
+    default void start(){
+        getLocationDelegate().start();
     }
 
     @Override
@@ -34,28 +41,44 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
     public LocationDelegate getLocationDelegate();
 
-    public abstract class LocationDelegate<T extends AbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
-
-        public GoogleApiClient locationClient;
+    public abstract class LocationDelegate<T extends IAbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
 
         public Location location;
 
         public boolean isFirstLocation = true;
 
-        public LocationDelegate(AbsPresenter presenter) {
+        protected BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ACTION_LOCATION.equals(intent.getAction()))
+                {
+                    Location location = intent.getExtras().getParcelable(BundleUtil.KEY_DATA);
+                    LocationDelegate.this.location = location;
+                    onReceiveLocation(location);
+                    if (isFirstLocation)
+                        isFirstLocation = false;
+                }
+            }
+        };
+
+        public LocationDelegate(IAbsPresenter presenter) {
             super(presenter);
         }
 
         @Override
         public void afterOnCreate(Bundle bundle) {
-            //如果不使用自带权限方案，请在处理权限后自行调用startLocation方法
+            super.afterOnCreate(bundle);
+
+            LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,new IntentFilter(ACTION_LOCATION));
+
+            //如果不使用自带权限方案，请在处理权限后自行调用start方法
             if (FasterInterface.isIsAutoPermission())
             {
                 PermissionUtils.permission(PermissionConstants.LOCATION)
                         .callback(new PermissionUtils.FullCallback() {
                             @Override
                             public void onGranted(List<String> permissionsGranted) {
-                                startLocation();
+                                start();
                             }
 
                             @Override
@@ -68,64 +91,23 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
 
         @Override
         public void onResume() {
-
+            super.onResume();
         }
 
         @Override
         public void onPause() {
-
+            super.onPause();
         }
 
         @Override
         public void onDestroy() {
-            if (locationClient != null)
-                locationClient.disconnect();
-        }
-
-        @Override
-        public void onActivityResult(int i, int i1, Intent intent) {
-
+            super.onDestroy();
+            LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
         }
 
         //开始定位
-        public void startLocation(){
-            //定位
-            locationClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                        @SuppressLint("MissingPermission")
-                        @Override
-                        public void onConnected(@Nullable Bundle bundle) {
-                            LocationRequest mLocationRequest = LocationRequest.create();
-                            mLocationRequest.setInterval(2000);
-                            mLocationRequest.setFastestInterval(1000);
-                            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                            LocationServices.FusedLocationApi.requestLocationUpdates(locationClient, mLocationRequest, new LocationListener() {
-                                @Override
-                                public void onLocationChanged(Location location) {
-                                    LocationDelegate.this.location = location;
-
-                                    onReceiveLocation(location);
-
-                                    if (isFirstLocation)
-                                        isFirstLocation = false;
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onConnectionSuspended(int i) {
-
-                        }
-                    })
-                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                        @Override
-                        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-                        }
-                    })
-                    .addApi(LocationServices.API)
-                    .build();
-            locationClient.connect();
+        public void start(){
+            getContext().startService(new Intent(getContext(),BaseLocationService.class));
         }
 
         //获取定位
@@ -142,7 +124,4 @@ public interface IBaseLocationPresenter<T extends AbsView> extends AbsLocationPr
         //该方法在onReceiveLocation调用，重写该方法完成后续逻辑
         protected abstract void afterReceiveLocation(Location location);
     }
-
-
-
 }

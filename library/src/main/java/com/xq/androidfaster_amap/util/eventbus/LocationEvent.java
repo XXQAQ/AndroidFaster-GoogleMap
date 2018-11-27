@@ -1,8 +1,6 @@
 package com.xq.androidfaster_amap.util.eventbus;
 
-
 import android.location.Location;
-
 
 public class LocationEvent {
 
