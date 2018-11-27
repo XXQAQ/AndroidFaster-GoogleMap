@@ -198,6 +198,13 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                 }
             });
 
+            map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(LatLng latLng) {
+                    afterMapLongClick(latLng.latitude,latLng.longitude);
+                }
+            });
+
             map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -471,6 +478,8 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         //点击地图后调用
         protected abstract void afterMapClick(double lat,double lon);
+
+        protected abstract void afterMapLongClick(double lat,double lon);
 
         //路线规划结束后调用
         protected abstract void afterGetRouteFinish(ArrayList<Route> result, int erroCode);
