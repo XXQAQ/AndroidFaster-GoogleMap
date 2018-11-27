@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.baselocation;
+package com.xq.androidfaster_map.baselocation;
 
 import android.location.Location;
 import com.xq.androidfaster.base.abs.IAbsPresenter;

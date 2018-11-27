@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.basemap;
+package com.xq.androidfaster_map.basemap;
 
 import android.annotation.SuppressLint;
 import android.graphics.Point;
@@ -24,9 +24,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.xq.androidfaster.base.abs.AbsViewDelegate;
 import com.xq.androidfaster.base.abs.IAbsView;
-import com.xq.androidfaster_amap.R;
-import com.xq.androidfaster_amap.bean.behavior.MarkBehavior;
-import com.xq.androidfaster_amap.util.MapUtils;
+import com.xq.androidfaster_map.R;
+import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
+import com.xq.androidfaster_map.util.MapUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

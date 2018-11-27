@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amapdemo;
+package com.xq.androidfaster_mapdemo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.xq.androidfaster_amapdemo", appContext.getPackageName());
+        assertEquals("com.xq.androidfaster_mapdemo", appContext.getPackageName());
     }
 }

@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.util;
+package com.xq.androidfaster_map.util;
 
 import android.content.Context;
 import com.directions.route.Route;

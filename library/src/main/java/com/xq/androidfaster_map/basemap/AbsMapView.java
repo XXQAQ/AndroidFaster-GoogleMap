@@ -1,7 +1,7 @@
-package com.xq.androidfaster_amap.basemap;
+package com.xq.androidfaster_map.basemap;
 
 import com.xq.androidfaster.base.abs.IAbsView;
-import com.xq.androidfaster_amap.bean.behavior.MarkBehavior;
+import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
 import java.util.List;
 
 public interface AbsMapView<T extends AbsMapPresenter> extends IAbsView<T> {

@@ -1,6 +1,6 @@
-package com.xq.androidfaster_amap.bean.entity;
+package com.xq.androidfaster_map.bean.entity;
 
-import com.xq.androidfaster_amap.bean.behavior.MarkBehavior;
+import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
 
 public class MarkBean implements MarkBehavior {
 

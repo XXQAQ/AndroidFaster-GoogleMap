@@ -1,2 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xq.androidfaster_amap" />
+    package="com.xq.androidfaster_map" >
+
+    <application>
+        <service android:name=".service.BaseLocationService"/>
+    </application>
+
+</manifest>

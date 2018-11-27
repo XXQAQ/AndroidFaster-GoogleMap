@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.bean.behavior;
+package com.xq.androidfaster_map.bean.behavior;
 
 import java.io.Serializable;
 

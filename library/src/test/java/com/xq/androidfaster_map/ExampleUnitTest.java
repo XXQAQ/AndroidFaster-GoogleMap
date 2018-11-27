@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amapdemo;
+package com.xq.androidfaster_map;
 
 import org.junit.Test;
 

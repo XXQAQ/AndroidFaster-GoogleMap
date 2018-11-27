@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.baselocation;
+package com.xq.androidfaster_map.baselocation;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -22,10 +22,10 @@ import com.xq.androidfaster.base.abs.IAbsView;
 import com.xq.androidfaster.util.constant.PermissionConstants;
 import com.xq.androidfaster.util.tools.BundleUtil;
 import com.xq.androidfaster.util.tools.PermissionUtils;
-import com.xq.androidfaster_amap.service.BaseLocationService;
+import com.xq.androidfaster_map.service.BaseLocationService;
 import java.util.List;
 
-import static com.xq.androidfaster_amap.service.BaseLocationService.ACTION_LOCATION;
+import static com.xq.androidfaster_map.service.BaseLocationService.ACTION_LOCATION;
 
 public interface IBaseLocationPresenter<T extends IAbsView> extends AbsLocationPresenter<T>{
 

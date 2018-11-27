@@ -1,4 +1,4 @@
-package com.xq.androidfaster_amap.service;
+package com.xq.androidfaster_map.service;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
