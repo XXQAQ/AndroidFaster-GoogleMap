@@ -2,7 +2,12 @@
     package="com.xq.androidfaster_map" >
 
     <application>
+
         <service android:name=".service.BaseLocationService"/>
+
+        <!--GoogleMap-->
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/map_key"/>
+
     </application>
 
 </manifest>

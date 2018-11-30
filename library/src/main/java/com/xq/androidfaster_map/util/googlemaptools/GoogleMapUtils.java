@@ -1,4 +1,4 @@
-package com.xq.androidfaster_map.util;
+package com.xq.androidfaster_map.util.googlemaptools;
 
 import android.content.Context;
 import com.directions.route.Route;
@@ -13,7 +13,7 @@ import com.xq.androidfaster.util.tools.ScreenUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapUtils {
+public class GoogleMapUtils {
 
     public static PolylineOptions addRoutePolyLine(ArrayList<Route> route, int lineColor) {
         PolylineOptions polyOptions = new PolylineOptions();

@@ -26,7 +26,7 @@ import com.xq.androidfaster.base.abs.AbsViewDelegate;
 import com.xq.androidfaster.base.abs.IAbsView;
 import com.xq.androidfaster_map.R;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
-import com.xq.androidfaster_map.util.MapUtils;
+import com.xq.androidfaster_map.util.googlemaptools.GoogleMapUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -337,7 +337,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         @Override
         public void clearMap() {
             map.clear();
-            MapUtils.removeRoutePolyLine(lastOverlay);
+            GoogleMapUtils.removeRoutePolyLine(lastOverlay);
             lastMarker = null;
             list_marker.clear();
         }
@@ -373,9 +373,9 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
                         @Override
                         public void onRoutingSuccess(ArrayList<Route> arrayList, int i) {
-                            MapUtils.removeRoutePolyLine(lastOverlay);
-                            Polyline polyline = map.addPolyline(MapUtils.addRoutePolyLine(arrayList, getColor(R.color.polyline)));
-                            MapUtils.moveMapToPolyline(getContext(),map,polyline);
+                            GoogleMapUtils.removeRoutePolyLine(lastOverlay);
+                            Polyline polyline = map.addPolyline(GoogleMapUtils.addRoutePolyLine(arrayList, getColor(R.color.polyline)));
+                            GoogleMapUtils.moveMapToPolyline(getContext(),map,polyline);
 
                             lastOverlay = polyline;
 
@@ -397,7 +397,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         public void removeLastRoute() {
             if (lastOverlay != null)
             {
-                MapUtils.removeRoutePolyLine(lastOverlay);
+                GoogleMapUtils.removeRoutePolyLine(lastOverlay);
                 lastOverlay = null;
             }
         }
