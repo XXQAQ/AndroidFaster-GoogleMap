@@ -12,6 +12,9 @@ public interface AbsMapView<T extends AbsMapPresenter> extends IAbsView<T> {
     //设置Marks(新添加进来会增加至地图，已存在则不变，不存在则会被删除)
     public void setDifferentMarks(final List<MarkBehavior> list);
 
+    //设置Marks(isAppend决定采用追加模式还是覆盖模式)
+    public void setDifferentMarks(final List<MarkBehavior> list,boolean isAppend);
+
     //删除指定Markes
     public void removeMarks(final List<MarkBehavior> list);
 
@@ -30,8 +33,14 @@ public interface AbsMapView<T extends AbsMapPresenter> extends IAbsView<T> {
     //驾车路线规划
     public void driver(double[][] position);
 
+    //兴趣点搜索
+    public void poi(String keyWord,String city,int page);
+
     //清除上次路线规划
     public void removeLastRoute();
+
+    //清除上次兴趣点检索
+    public void removeLastPoi();
 
     //隐藏弹窗
     public void hideInfoWindow();

@@ -24,9 +24,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.xq.androidfaster.base.abs.AbsViewDelegate;
 import com.xq.androidfaster.base.abs.IAbsView;
-import com.xq.androidfaster_map.R;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
-import com.xq.androidfaster_map.util.googlemaptools.GoogleMapUtils;
+import com.xq.androidfaster_map.util.googlemap.GoogleMapUtils;
+import com.xq.androidfaster_map.util.googlemap.overlay.PoiOverlay;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
     @Override
     default void setDifferentMarks(final List<MarkBehavior> list){
         getMapDelegate().setDifferentMarks(list);
+    }
+
+    @Override
+    default void setDifferentMarks(final List<MarkBehavior> list, boolean isAppend) {
+        getMapDelegate().setDifferentMarks(list,isAppend);
     }
 
     @Override
@@ -75,8 +81,18 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
     }
 
     @Override
+    default void poi(String keyWord, String city, int page) {
+        getMapDelegate().poi(keyWord,city,page);
+    }
+
+    @Override
     default void removeLastRoute() {
         getMapDelegate().removeLastRoute();
+    }
+
+    @Override
+    default void removeLastPoi() {
+        getMapDelegate().removeLastPoi();
     }
 
     @Override
@@ -122,7 +138,8 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         public CopyOnWriteArrayList<Marker> list_marker = new CopyOnWriteArrayList<>();
         public Marker lastMarker;
 
-        public Polyline lastOverlay;
+        public Polyline lastRouteOverlay;
+        public PoiOverlay lastPoiOverlay;
 
         public MapDelegate(IAbsView view) {
             super(view);
@@ -178,8 +195,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             GoogleMap.InfoWindowAdapter adapter = new GoogleMap.InfoWindowAdapter() {
                 @Override
                 public View getInfoWindow(Marker marker) {
-                    MarkBehavior behavior = (MarkBehavior) marker.getTag();
-                    return getWindowView(behavior);
+                    return getWindowView(marker);
                 }
 
                 @Override
@@ -194,14 +210,14 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    afterMapClick(latLng.latitude,latLng.longitude);
+                    afterMapClick(new double[]{latLng.latitude,latLng.longitude});
                 }
             });
 
             map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                 @Override
                 public void onMapLongClick(LatLng latLng) {
-                    afterMapLongClick(latLng.latitude,latLng.longitude);
+                    afterMapLongClick(new double[]{latLng.latitude,latLng.longitude});
                 }
             });
 
@@ -257,40 +273,44 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         @Override
-        public void setDifferentMarks(final List<MarkBehavior> list){
+        public void setDifferentMarks(List<MarkBehavior> list) {
+            setDifferentMarks(list,false);
+        }
 
-            final List<MarkBehavior> list_new = new LinkedList<>();
-            final List<MarkBehavior> list_newCopy = new LinkedList<>();
+        @Override
+        public void setDifferentMarks(final List<MarkBehavior> list,boolean isAppend){
+
+            final List<MarkBehavior> list_old = new LinkedList<>();
             final List<MarkBehavior> list_remove = new LinkedList<>();
+            final List<MarkBehavior> list_newAdd = new LinkedList<>();
 
-            //遍历所有旧Marker，当发现旧marker在新集合中不存在的时候，则在原集合中删除且标记到删除集合中
             for (Marker marker : list_marker)
             {
                 MarkBehavior markBehavior = (MarkBehavior) marker.getTag();
+                list_old.add(markBehavior);
+            }
+
+            //遍历所有旧MarkBehavior，当发现旧marker在新list中不存在的时候，则在标记到删除集合中
+            for (MarkBehavior markBehavior : list_old)
+            {
                 if (!list.contains(markBehavior))
                 {
                     list_remove.add(markBehavior);
                 }
             }
+            if (!isAppend)
+                removeMarks(list_remove);
 
-            removeMarks(list_remove);
-
-            for (Marker marker : list_marker)
+            //遍历所有新list的MarkBehavior，只要该marker未添加到地图上，则标记到添加集合中
+            for (MarkBehavior markBehavior : list)
             {
-                MarkBehavior markBehavior = (MarkBehavior) marker.getTag();
-                list_newCopy.add(markBehavior);
-            }
-
-            //遍历所有新markerBehavior，只要该marker未添加到地图上，则将Marker标记到新集合中
-            for (MarkBehavior new_markBehavior : list)
-            {
-                if (!list_newCopy.contains(new_markBehavior))
+                if (!list_old.contains(markBehavior))
                 {
-                    list_new.add(new_markBehavior);
+                    list_newAdd.add(markBehavior);
                 }
             }
 
-            setMarks(list_new);
+            setMarks(list_newAdd);
         }
 
         @Override
@@ -337,7 +357,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         @Override
         public void clearMap() {
             map.clear();
-            GoogleMapUtils.removeRoutePolyLine(lastOverlay);
+            GoogleMapUtils.removeRoutePolyLine(lastRouteOverlay);
             lastMarker = null;
             list_marker.clear();
         }
@@ -363,7 +383,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                     .withListener(new RoutingListener() {
                         @Override
                         public void onRoutingFailure(RouteException e) {
-                            afterGetRouteFinish(null,-1);
+                            afterGetRouteFinish(null,false);
                         }
 
                         @Override
@@ -373,13 +393,12 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
                         @Override
                         public void onRoutingSuccess(ArrayList<Route> arrayList, int i) {
-                            GoogleMapUtils.removeRoutePolyLine(lastOverlay);
-                            Polyline polyline = map.addPolyline(GoogleMapUtils.addRoutePolyLine(arrayList, getColor(R.color.polyline)));
+                            Polyline polyline = map.addPolyline(GoogleMapUtils.addRoutePolyLine(arrayList));
                             GoogleMapUtils.moveMapToPolyline(getContext(),map,polyline);
 
-                            lastOverlay = polyline;
+                            lastRouteOverlay = polyline;
 
-                            afterGetRouteFinish(arrayList,i);
+                            afterGetRouteFinish(arrayList,true);
                         }
 
                         @Override
@@ -394,11 +413,57 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         @Override
+        public void poi(String keyWord,String city,int page){
+
+//            PoiSearch.Query query = new PoiSearch.Query(keyWord, "", city);
+//            query.setPageSize(20);
+//            query.setPageNum(page);
+//
+//            PoiSearch poiSearch = new PoiSearch(getContext(), query);
+//            poiSearch.setOnPoiSearchListener(new PoiSearch.OnPoiSearchListener() {
+//                @Override
+//                public void onPoiSearched(PoiResult poiResult, int i) {
+//                    List<PoiItem> poiItems = poiResult.getPois();
+//                    if (poiItems != null && poiItems != null && poiItems.size() > 0)
+//                    {
+//                        PoiOverlay poiOverlay = new PoiOverlay(map, poiItems);
+//                        poiOverlay.removeFromMap();
+//                        poiOverlay.addToMap();
+//                        poiOverlay.zoomToSpan();
+//
+//                        lastPoiOverlay = poiOverlay;
+//
+//                        afterGetPoiFinish(poiResult,true);
+//                    }
+//                    else
+//                    {
+//                        afterGetPoiFinish(poiResult,false);
+//                    }
+//                }
+//
+//                @Override
+//                public void onPoiItemSearched(PoiItem poiItem, int i) {
+//
+//                }
+//            });
+//            poiSearch.searchPOIAsyn();
+        }
+
+        @Override
         public void removeLastRoute() {
-            if (lastOverlay != null)
+            if (lastRouteOverlay != null)
             {
-                GoogleMapUtils.removeRoutePolyLine(lastOverlay);
-                lastOverlay = null;
+                GoogleMapUtils.removeRoutePolyLine(lastRouteOverlay);
+                lastRouteOverlay = null;
+            }
+        }
+
+        @Override
+        public void removeLastPoi(){
+            if (lastPoiOverlay != null)
+            {
+                lastPoiOverlay.removeFromMap();
+                lastPoiOverlay = null;
             }
         }
 
@@ -428,13 +493,9 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         @Override
         public void moveMapToLocationPoint(){
             if (getPresenter().getLocation() != null)
-            {
                 moveMapToPoint(new double[]{getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude()});
-            }
             else
-            {
                 afterGetLocationErro();
-            }
         }
 
         @Override
@@ -455,7 +516,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         //重写该方法处理定位失败后逻辑
-        protected abstract void afterGetLocationErro();
+        public abstract void afterGetLocationErro();
 
         //重写该方法返回定位点图标
         protected abstract int getLocationIcon();
@@ -467,7 +528,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         protected abstract BitmapDescriptor getMarkerDescript(MarkBehavior behavior);
 
         //重写该方法返回弹窗样式
-        protected abstract View getWindowView(MarkBehavior behavior);
+        protected abstract View getWindowView(Marker marker);
 
         //标记点击后调用
         protected abstract void afterMarkerClick(Marker marker);
@@ -476,13 +537,16 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         protected abstract void afterMapStatusChangeFinish(CameraPosition cameraPosition);
 
         //点击地图后调用
-        protected abstract void afterMapClick(double lat,double lon);
+        protected abstract void afterMapClick(double[] position);
 
         //长按地图后调用
-        protected abstract void afterMapLongClick(double lat,double lon);
+        protected abstract void afterMapLongClick(double[] position);
 
         //路线规划结束后调用
-        protected abstract void afterGetRouteFinish(ArrayList<Route> result, int erroCode);
+        protected abstract void afterGetRouteFinish(ArrayList<Route> result, boolean isSuccess);
+
+        //兴趣点搜索结束后调用
+        protected abstract void afterGetPoiFinish(PoiResult result,boolean isSuccess);
 
     }
 

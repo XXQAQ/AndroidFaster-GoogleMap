@@ -1,6 +1,8 @@
-package com.xq.androidfaster_map.util.googlemaptools;
+package com.xq.androidfaster_map.util.googlemap;
 
 import android.content.Context;
+import android.content.res.Resources;
+
 import com.directions.route.Route;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -10,17 +12,19 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.xq.androidfaster.util.tools.ScreenUtils;
+import com.xq.androidfaster_map.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class GoogleMapUtils {
 
-    public static PolylineOptions addRoutePolyLine(ArrayList<Route> route, int lineColor) {
+    public static PolylineOptions addRoutePolyLine(ArrayList<Route> route) {
         PolylineOptions polyOptions = new PolylineOptions();
         //add route(s) to the map.
         for (int i = 0; i < route.size(); i++) {
-            polyOptions.color(lineColor);
-            polyOptions.width(12);
+            polyOptions.color(Resources.getSystem().getColor(R.color.polyline));
+            polyOptions.width(15f);
             polyOptions.addAll(route.get(i).getPoints());
         }
 

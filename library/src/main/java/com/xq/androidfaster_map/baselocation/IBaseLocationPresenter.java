@@ -34,7 +34,7 @@ public interface IBaseLocationPresenter<T extends IAbsView> extends AbsLocationP
 
     public abstract class LocationDelegate<T extends IAbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
 
-        public Location location;
+        protected Location location;
 
         public boolean isFirstLocation = true;
 
