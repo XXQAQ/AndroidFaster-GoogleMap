@@ -137,7 +137,6 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         public CopyOnWriteArrayList<Marker> list_marker = new CopyOnWriteArrayList<>();
         public Marker lastMarker;
-
         public Polyline lastRouteOverlay;
         public PoiOverlay lastPoiOverlay;
 
