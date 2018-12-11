@@ -1,9 +1,12 @@
 package com.xq.androidfaster_map.bean.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.xq.androidfaster.bean.behavior.TitleBehavior;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
 
-public class MarkBean implements MarkBehavior, TitleBehavior {
+public class MarkBean implements MarkBehavior,TitleBehavior {
 
     private double latitude;
     private double longitude;
@@ -118,4 +121,35 @@ public class MarkBean implements MarkBehavior, TitleBehavior {
     public void setTag(Object tag) {
         this.tag = tag;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeSerializable(this);
+    }
+
+    protected MarkBean(Parcel in) {
+        MarkBehavior behavior = (MarkBehavior) in.readSerializable();
+        this.latitude = behavior.getLatitude();
+        this.longitude = behavior.getLongitude();
+        this.title = behavior.getTitle();
+        this.littleTitle = behavior.getLittleTitle();
+        this.tag = behavior.getTag();
+    }
+
+    public static final Parcelable.Creator<MarkBean> CREATOR = new Parcelable.Creator<MarkBean>() {
+        @Override
+        public MarkBean createFromParcel(Parcel source) {
+            return new MarkBean(source);
+        }
+
+        @Override
+        public MarkBean[] newArray(int size) {
+            return new MarkBean[size];
+        }
+    };
 }
