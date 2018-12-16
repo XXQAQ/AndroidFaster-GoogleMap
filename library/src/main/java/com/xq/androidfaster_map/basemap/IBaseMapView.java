@@ -25,9 +25,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.xq.androidfaster.base.abs.AbsViewDelegate;
 import com.xq.androidfaster.base.abs.IAbsView;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
+import com.xq.androidfaster_map.bean.entity.MarkBean;
 import com.xq.androidfaster_map.util.googlemap.GoogleMapUtils;
-import com.xq.androidfaster_map.util.googlemap.overlay.PoiOverlay;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -138,7 +137,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         public CopyOnWriteArrayList<Marker> list_marker = new CopyOnWriteArrayList<>();
         public Marker lastMarker;
         public Polyline lastRouteOverlay;
-        public PoiOverlay lastPoiOverlay;
+//        public PoiOverlay lastPoiOverlay;
 
         public MapDelegate(IAbsView view) {
             super(view);
@@ -459,11 +458,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         @Override
         public void removeLastPoi(){
-            if (lastPoiOverlay != null)
-            {
-                lastPoiOverlay.removeFromMap();
-                lastPoiOverlay = null;
-            }
+//            if (lastPoiOverlay != null)
+//            {
+//                lastPoiOverlay.removeFromMap();
+//                lastPoiOverlay = null;
+//            }
         }
 
         @Override
@@ -545,7 +544,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         protected abstract void afterGetRouteFinish(ArrayList<Route> result, boolean isSuccess);
 
         //兴趣点搜索结束后调用
-        protected abstract void afterGetPoiFinish(PoiResult result,boolean isSuccess);
+        protected abstract void afterGetPoiFinish(MarkBean result, boolean isSuccess);
 
     }
 

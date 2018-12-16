@@ -2,9 +2,9 @@ package com.xq.androidfaster_map.bean.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.xq.androidfaster.bean.behavior.TitleBehavior;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
+import java.io.Serializable;
 
 public class MarkBean implements MarkBehavior,TitleBehavior {
 
@@ -129,19 +129,28 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeSerializable(this);
+        dest.writeDouble(this.latitude);
+        dest.writeDouble(this.longitude);
+        dest.writeString(this.title);
+        dest.writeString(this.littleTitle);
+        if (tag instanceof Parcelable)
+            dest.writeParcelable((Parcelable) tag, flags);
+        else    if (tag instanceof Serializable)
+            dest.writeSerializable((Serializable) tag);
     }
 
     protected MarkBean(Parcel in) {
-        MarkBehavior behavior = (MarkBehavior) in.readSerializable();
-        this.latitude = behavior.getLatitude();
-        this.longitude = behavior.getLongitude();
-        this.title = behavior.getTitle();
-        this.littleTitle = behavior.getLittleTitle();
-        this.tag = behavior.getTag();
+        this.latitude = in.readDouble();
+        this.longitude = in.readDouble();
+        this.title = in.readString();
+        this.littleTitle = in.readString();
+        if (tag instanceof Parcelable)
+            this.tag = in.readParcelable(Object.class.getClassLoader());
+        else    if (tag instanceof Serializable)
+            this.tag = in.readSerializable();
     }
 
-    public static final Parcelable.Creator<MarkBean> CREATOR = new Parcelable.Creator<MarkBean>() {
+    public static final Creator<MarkBean> CREATOR = new Creator<MarkBean>() {
         @Override
         public MarkBean createFromParcel(Parcel source) {
             return new MarkBean(source);
