@@ -66,7 +66,7 @@ public interface IBaseLocationPresenter<T extends IAbsView> extends AbsLocationP
                     .callback(new PermissionUtils.FullCallback() {
                         @Override
                         public void onGranted(List<String> permissionsGranted) {
-                            start();
+                            onLocationPermissionSuccess();
                         }
 
                         @Override
@@ -90,6 +90,11 @@ public interface IBaseLocationPresenter<T extends IAbsView> extends AbsLocationP
         //获取定位
         public Location getLocation() {
             return location;
+        }
+
+        //获取权限成功后调用
+        protected void onLocationPermissionSuccess(){
+            start();
         }
 
         //该方法在接收到定位数据后调用，您需要忽略此方法，而选择重写afterReceiveLocation完成后续逻辑

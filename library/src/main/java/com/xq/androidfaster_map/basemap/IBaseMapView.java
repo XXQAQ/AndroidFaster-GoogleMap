@@ -35,6 +35,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T> {
 
     @Override
+    default void initLocationPoint() {
+        getMapDelegate().initLocationPoint();
+    }
+
+    @Override
     default void setMarks(List<MarkBehavior> list){
         getMapDelegate().setMarks(list);
     }
@@ -184,10 +189,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             mapView.onSaveInstanceState(outState);
         }
 
-        @SuppressLint("MissingPermission")
         protected void initMapView(){
-
-            map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
 
             //map相关设置
             GoogleMap.InfoWindowAdapter adapter = new GoogleMap.InfoWindowAdapter() {
@@ -239,6 +241,12 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                     afterMapStatusChangeFinish(cameraPosition);
                 }
             });
+        }
+
+        @SuppressLint("MissingPermission")
+        @Override
+        public void initLocationPoint() {
+            map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
         }
 
         @Override
