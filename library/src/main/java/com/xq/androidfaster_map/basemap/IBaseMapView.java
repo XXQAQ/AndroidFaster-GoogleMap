@@ -24,6 +24,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.xq.androidfaster.base.abs.AbsViewDelegate;
 import com.xq.androidfaster.base.abs.IAbsView;
+import com.xq.androidfaster.util.constant.PermissionConstants;
+import com.xq.androidfaster.util.tools.PermissionUtils;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
 import com.xq.androidfaster_map.bean.entity.MarkBean;
 import com.xq.androidfaster_map.util.googlemap.GoogleMapUtils;
@@ -33,11 +35,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T> {
-
-    @Override
-    default void initLocationPoint() {
-        getMapDelegate().initLocationPoint();
-    }
 
     @Override
     default void setMarks(List<MarkBehavior> list){
@@ -191,6 +188,19 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
 
         protected void initMapView(){
 
+            PermissionUtils.permission(PermissionConstants.LOCATION)
+                    .callback(new PermissionUtils.FullCallback() {
+                        @SuppressLint("MissingPermission")
+                        @Override
+                        public void onGranted(List<String> permissionsGranted) {
+                            map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
+                        }
+                        @Override
+                        public void onDenied(List<String> permissionsDeniedForever, List<String> permissionsDenied) {
+                        }
+                    })
+                    .request();
+
             //map相关设置
             GoogleMap.InfoWindowAdapter adapter = new GoogleMap.InfoWindowAdapter() {
                 @Override
@@ -241,12 +251,6 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                     afterMapStatusChangeFinish(cameraPosition);
                 }
             });
-        }
-
-        @SuppressLint("MissingPermission")
-        @Override
-        public void initLocationPoint() {
-            map.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
         }
 
         @Override

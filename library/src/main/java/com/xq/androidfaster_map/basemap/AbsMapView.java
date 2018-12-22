@@ -6,9 +6,6 @@ import java.util.List;
 
 public interface AbsMapView<T extends AbsMapPresenter> extends IAbsView<T> {
 
-    //初始化定位小蓝点
-    public void initLocationPoint();
-
     //设置Marks
     public void setMarks(List<MarkBehavior> list);
 
