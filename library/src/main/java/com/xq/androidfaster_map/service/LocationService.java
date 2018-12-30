@@ -38,7 +38,7 @@ public class LocationService extends Service {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setInterval(1000); // two minute interval
         locationRequest.setFastestInterval(1000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         locationCallback = new LocationCallback(){
             @Override
