@@ -57,8 +57,8 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
     }
 
     @Override
-    default void clearMarkes(){
-        getMapDelegate().clearMarkes();
+    default void clearMarks(){
+        getMapDelegate().clearMarks();
     }
 
     @Override
@@ -336,7 +336,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         }
 
         @Override
-        public void clearMarkes(){
+        public void clearMarks(){
             reallyRemoveMarks(list_marker);
         }
 
@@ -553,10 +553,10 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
         protected abstract void afterMapLongClick(double[] position);
 
         //路线规划结束后调用
-        protected abstract void afterGetRouteFinish(ArrayList<Route> result, boolean isSuccess);
+        protected abstract void afterGetRouteFinish(List<Route> result, boolean isSuccess);
 
         //兴趣点搜索结束后调用
-        protected abstract void afterGetPoiFinish(MarkBean result, boolean isSuccess);
+        protected abstract void afterGetPoiFinish(List<MarkBean> result, boolean isSuccess);
 
     }
 
