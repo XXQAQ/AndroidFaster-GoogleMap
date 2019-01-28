@@ -1,4 +1,4 @@
-package com.xq.androidfaster_map.basemap;
+package com.xq.androidfaster_map.base.basemap;
 
 import com.xq.androidfaster.base.abs.IAbsView;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;

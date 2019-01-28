@@ -1,4 +1,4 @@
-package com.xq.androidfaster_map.baselocation;
+package com.xq.androidfaster_map.base.baselocation;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

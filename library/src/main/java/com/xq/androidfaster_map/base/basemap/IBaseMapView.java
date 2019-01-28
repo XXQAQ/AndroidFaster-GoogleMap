@@ -1,4 +1,4 @@
-package com.xq.androidfaster_map.basemap;
+package com.xq.androidfaster_map.base.basemap;
 
 import android.annotation.SuppressLint;
 import android.graphics.Point;

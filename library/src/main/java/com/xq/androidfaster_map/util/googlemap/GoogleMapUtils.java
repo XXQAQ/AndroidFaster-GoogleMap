@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.xq.androidfaster.AndroidFaster;
 import com.xq.androidfaster.util.tools.ScreenUtils;
 import com.xq.androidfaster_map.R;
 
@@ -23,7 +24,7 @@ public class GoogleMapUtils {
         PolylineOptions polyOptions = new PolylineOptions();
         //add route(s) to the map.
         for (int i = 0; i < route.size(); i++) {
-            polyOptions.color(Resources.getSystem().getColor(R.color.polyline));
+            polyOptions.color(AndroidFaster.getApp().getResources().getColor(R.color.polyline));
             polyOptions.width(15f);
             polyOptions.addAll(route.get(i).getPoints());
         }
