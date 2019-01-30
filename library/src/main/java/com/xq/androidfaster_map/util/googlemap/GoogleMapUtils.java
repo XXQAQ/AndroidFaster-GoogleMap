@@ -43,8 +43,8 @@ public class GoogleMapUtils {
         for (int i = 0; i < positionList.size(); i++) {
             builder.include(positionList.get(i));
         }
-        LatLngBounds bounds = builder.build();
         int padding = ScreenUtils.dip2px(context, 100);
+        LatLngBounds bounds = builder.build();
         CameraUpdate u = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         map.animateCamera(u);
     }

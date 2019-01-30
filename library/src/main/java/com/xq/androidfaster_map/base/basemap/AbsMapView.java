@@ -54,6 +54,9 @@ public interface AbsMapView<T extends AbsMapPresenter> extends IAbsView<T> {
     //移动地图至当前位置
     public void moveMapToLocationPoint();
 
+    //调整地图缩放范围（单位为米）
+    public void zoomMap(int scale);
+
     //获取当前地图可视经纬度(上左与右下的经纬度)
     public double[][] getMapArea();
 

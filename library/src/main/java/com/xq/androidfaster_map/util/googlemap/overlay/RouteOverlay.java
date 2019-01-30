@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.xq.androidfaster.util.tools.ScreenUtils;
 import com.xq.androidfaster_map.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -132,9 +133,9 @@ public class RouteOverlay {
 			if (mAMap == null)
 				return;
 			try {
+				int padding = ScreenUtils.dip2px(mContext, 100);
 				LatLngBounds bounds = getLatLngBounds();
-				mAMap.animateCamera(CameraUpdateFactory
-						.newLatLngBounds(bounds, 50));
+				mAMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

@@ -26,6 +26,7 @@ import com.xq.androidfaster.base.abs.AbsViewDelegate;
 import com.xq.androidfaster.base.abs.IAbsView;
 import com.xq.androidfaster.util.constant.PermissionConstants;
 import com.xq.androidfaster.util.tools.PermissionUtils;
+import com.xq.androidfaster.util.tools.ScreenUtils;
 import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
 import com.xq.androidfaster_map.bean.entity.MarkBean;
 import com.xq.androidfaster_map.util.googlemap.GoogleMapUtils;
@@ -114,6 +115,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
     @Override
     default void moveMapToLocationPoint(){
         getMapDelegate().moveMapToLocationPoint();
+    }
+
+    @Override
+    default void zoomMap(int scale) {
+        getMapDelegate().zoomMap(scale);
     }
 
     @Override
@@ -492,12 +498,13 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
             for(int i=0;i<position.length;i++)
                 boundsBuilder.include(new LatLng(position[i][0],position[i][1]));
 
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds( boundsBuilder.build(),15));
+            int padding = ScreenUtils.dip2px(getContext(), 100);
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds( boundsBuilder.build(),padding));
         }
 
         @Override
         public void moveMapToPoint(double[] position){
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(position[0],position[1]),15));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(position[0],position[1]),map.getCameraPosition().zoom));
         }
 
         @Override
@@ -506,6 +513,34 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends AbsMapView<T>
                 moveMapToPoint(new double[]{getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude()});
             else
                 afterGetLocationErro();
+        }
+
+        @Override
+        public void zoomMap(int scale) {
+            map.animateCamera(CameraUpdateFactory.zoomTo(scaleToZoom(scale)));
+        }
+
+        //缩放换算
+        private int scaleToZoom(int scale) {
+            if (scale <= 10) return 19;
+            else if (scale <= 25) return 18;
+            else if (scale <= 50) return 17;
+            else if (scale <= 100) return 16;
+            else if (scale <= 200) return 15;
+            else if (scale <= 500) return 14;
+            else if (scale <= 1000) return 13;
+            else if (scale <= 2000) return 12;
+            else if (scale <= 5000) return 11;
+            else if (scale <= 10000) return 10;
+            else if (scale <= 20000) return 9;
+            else if (scale <= 30000) return 8;
+            else if (scale <= 50000) return 7;
+            else if (scale <= 100000) return 6;
+            else if (scale <= 200000) return 5;
+            else if (scale <= 500000) return 4;
+            else if (scale <= 1000000) return 3;
+            else if (scale > 1000000) return 2;
+            return 20;
         }
 
         @Override
