@@ -25,19 +25,19 @@ public interface IAbsMapView<T extends IAbsMapPresenter> extends IAbsView<T> {
     public void clearMap();
 
     //步行路线规划
-    public void walk(double[][] position);
+    public void walkRoute(double[][] position);
 
     //公交路线规划
-    public void traffic(double[][] position, String city);
+    public void trafficRoute(double[][] position, String city);
 
     //驾车路线规划
-    public void driver(double[][] position);
+    public void driverRoute(double[][] position);
 
-    //兴趣点搜索（区域搜索）
-    public void poi(String keyWord, String city, int page);
+    //兴趣点搜索（地区内搜索）
+    public void regionPoi(String keyWord, String city, int page);
 
     //兴趣点搜索（附近搜索）
-    public void poi(String keyWord, double[]position, int radius, int page);
+    public void nearbyPoi(String keyWord, double[]position, int radius, int page);
 
     //清除上次路线规划
     public void removeLastRoute();
