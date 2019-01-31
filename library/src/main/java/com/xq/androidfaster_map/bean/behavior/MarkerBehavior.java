@@ -2,11 +2,9 @@ package com.xq.androidfaster_map.bean.behavior;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import java.io.Serializable;
 
-
-public interface MarkBehavior extends Serializable,Parcelable {
+public interface MarkerBehavior extends Serializable,Parcelable {
 
     @Override
     default int describeContents(){

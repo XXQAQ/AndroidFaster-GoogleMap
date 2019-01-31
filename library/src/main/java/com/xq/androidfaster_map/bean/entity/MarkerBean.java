@@ -3,26 +3,26 @@ package com.xq.androidfaster_map.bean.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.xq.androidfaster.bean.behavior.TitleBehavior;
-import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
+import com.xq.androidfaster_map.bean.behavior.MarkerBehavior;
 import java.io.Serializable;
 
-public class MarkBean implements MarkBehavior,TitleBehavior {
+public class MarkerBean implements MarkerBehavior,TitleBehavior {
 
     private double latitude;
     private double longitude;
     private String title;
     private Object tag;
 
-    public MarkBean() {
+    public MarkerBean() {
     }
 
-    public MarkBean(double latitude, double longitude, String title) {
+    public MarkerBean(double latitude, double longitude, String title) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.title = title;
     }
 
-    public MarkBean(double latitude, double longitude, String title, Object tag) {
+    public MarkerBean(double latitude, double longitude, String title, Object tag) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.title = title;
@@ -31,7 +31,7 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
 
     @Override
     public String toString() {
-        return "MarkBean{" +
+        return "MarkerBean{" +
                 "latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", title='" + title + '\'' +
@@ -44,12 +44,12 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MarkBean markBean = (MarkBean) o;
+        MarkerBean markerBean = (MarkerBean) o;
 
-        if (Double.compare(markBean.latitude, latitude) != 0) return false;
-        if (Double.compare(markBean.longitude, longitude) != 0) return false;
-        if (title != null ? !title.equals(markBean.title) : markBean.title != null) return false;
-        return tag != null ? tag.equals(markBean.tag) : markBean.tag == null;
+        if (Double.compare(markerBean.latitude, latitude) != 0) return false;
+        if (Double.compare(markerBean.longitude, longitude) != 0) return false;
+        if (title != null ? !title.equals(markerBean.title) : markerBean.title != null) return false;
+        return tag != null ? tag.equals(markerBean.tag) : markerBean.tag == null;
     }
 
     @Override
@@ -116,7 +116,7 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
             dest.writeSerializable((Serializable) tag);
     }
 
-    protected MarkBean(Parcel in) {
+    protected MarkerBean(Parcel in) {
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.title = in.readString();
@@ -126,15 +126,15 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
             this.tag = in.readSerializable();
     }
 
-    public static final Creator<MarkBean> CREATOR = new Creator<MarkBean>() {
+    public static final Creator<MarkerBean> CREATOR = new Creator<MarkerBean>() {
         @Override
-        public MarkBean createFromParcel(Parcel source) {
-            return new MarkBean(source);
+        public MarkerBean createFromParcel(Parcel source) {
+            return new MarkerBean(source);
         }
 
         @Override
-        public MarkBean[] newArray(int size) {
-            return new MarkBean[size];
+        public MarkerBean[] newArray(int size) {
+            return new MarkerBean[size];
         }
     };
 }

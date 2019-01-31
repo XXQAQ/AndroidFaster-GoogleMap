@@ -1,25 +1,25 @@
 package com.xq.androidfaster_map.base.basemap;
 
 import com.xq.androidfaster.base.abs.IAbsView;
-import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
+import com.xq.androidfaster_map.bean.behavior.MarkerBehavior;
 import java.util.List;
 
 public interface IAbsMapView<T extends IAbsMapPresenter> extends IAbsView<T> {
 
-    //设置Marks(不会对地图上已添加的Marks去重)
-    public void setMarks(List<MarkBehavior> list);
+    //设置Markers(不会对地图上已添加的Markers去重)
+    public void setMarkers(List<MarkerBehavior> list);
 
-    //设置Marks(对重复添加的Marks去重，且使用覆盖模式)
-    public void setDifferentMarks(final List<MarkBehavior> list);
+    //设置Markers(对重复添加的Markers去重，且使用覆盖模式)
+    public void setDifferentMarkers(final List<MarkerBehavior> list);
 
-    //设置Marks(对重复添加的Marks去重，isAppend表示追加模式或者覆盖模式)
-    public void setDifferentMarks(final List<MarkBehavior> list, boolean isAppend);
+    //设置Markers(对重复添加的Markers去重，isAppend表示追加模式或者覆盖模式)
+    public void setDifferentMarkers(final List<MarkerBehavior> list, boolean isAppend);
 
-    //删除指定Marks
-    public void removeMarks(final List<MarkBehavior> list);
+    //删除指定Markers
+    public void removeMarkers(final List<MarkerBehavior> list);
 
-    //清空所有Marks
-    public void clearMarks();
+    //清空所有Markers
+    public void clearMarkers();
 
     //清空地图
     public void clearMap();

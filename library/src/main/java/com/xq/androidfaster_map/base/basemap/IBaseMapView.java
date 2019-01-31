@@ -27,8 +27,8 @@ import com.xq.androidfaster.base.abs.IAbsView;
 import com.xq.androidfaster.util.constant.PermissionConstants;
 import com.xq.androidfaster.util.tools.PermissionUtils;
 import com.xq.androidfaster.util.tools.ScreenUtils;
-import com.xq.androidfaster_map.bean.behavior.MarkBehavior;
-import com.xq.androidfaster_map.bean.entity.MarkBean;
+import com.xq.androidfaster_map.bean.behavior.MarkerBehavior;
+import com.xq.androidfaster_map.bean.entity.MarkerBean;
 import com.xq.androidfaster_map.util.googlemap.GoogleMapUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -38,28 +38,28 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T> {
 
     @Override
-    default void setMarks(List<MarkBehavior> list){
-        getMapDelegate().setMarks(list);
+    default void setMarkers(List<MarkerBehavior> list){
+        getMapDelegate().setMarkers(list);
     }
 
     @Override
-    default void setDifferentMarks(final List<MarkBehavior> list){
-        getMapDelegate().setDifferentMarks(list);
+    default void setDifferentMarkers(final List<MarkerBehavior> list){
+        getMapDelegate().setDifferentMarkers(list);
     }
 
     @Override
-    default void setDifferentMarks(final List<MarkBehavior> list, boolean isAppend) {
-        getMapDelegate().setDifferentMarks(list,isAppend);
+    default void setDifferentMarkers(final List<MarkerBehavior> list, boolean isAppend) {
+        getMapDelegate().setDifferentMarkers(list,isAppend);
     }
 
     @Override
-    default void removeMarks(final List<MarkBehavior> list) {
-        getMapDelegate().removeMarks(list);
+    default void removeMarkers(final List<MarkerBehavior> list) {
+        getMapDelegate().removeMarkers(list);
     }
 
     @Override
-    default void clearMarks(){
-        getMapDelegate().clearMarks();
+    default void clearMarkers(){
+        getMapDelegate().clearMarkers();
     }
 
     @Override
@@ -275,11 +275,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
         }
 
         @Override
-        public void setMarks(List<MarkBehavior> list){
+        public void setMarkers(List<MarkerBehavior> list){
 
-            List<Marker> list_mark = new LinkedList<>();
+            List<Marker> list_newMarker = new LinkedList<>();
 
-            for (MarkBehavior behavior : list)
+            for (MarkerBehavior behavior : list)
             {
                 MarkerOptions markerOption = new MarkerOptions();
                 markerOption.position(new LatLng(behavior.getLatitude(),behavior.getLongitude()));
@@ -297,55 +297,55 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
 //                marker.setAnimation(animation);
 //                marker.startAnimation();
 
-                list_mark.add(marker);
+                list_newMarker.add(marker);
             }
 
-            list_marker.addAll(list_mark);
+            list_marker.addAll(list_newMarker);
         }
 
         @Override
-        public void setDifferentMarks(List<MarkBehavior> list) {
-            setDifferentMarks(list,false);
+        public void setDifferentMarkers(List<MarkerBehavior> list) {
+            setDifferentMarkers(list,false);
         }
 
         @Override
-        public void setDifferentMarks(final List<MarkBehavior> list,boolean isAppend){
+        public void setDifferentMarkers(final List<MarkerBehavior> list, boolean isAppend){
 
-            final List<MarkBehavior> list_old = new LinkedList<>();
-            final List<MarkBehavior> list_remove = new LinkedList<>();
-            final List<MarkBehavior> list_newAdd = new LinkedList<>();
+            final List<MarkerBehavior> list_old = new LinkedList<>();
+            final List<MarkerBehavior> list_remove = new LinkedList<>();
+            final List<MarkerBehavior> list_newAdd = new LinkedList<>();
 
             for (Marker marker : list_marker)
             {
-                MarkBehavior markBehavior = (MarkBehavior) marker.getTag();
-                list_old.add(markBehavior);
+                MarkerBehavior behavior = (MarkerBehavior) marker.getTag();
+                list_old.add(behavior);
             }
 
-            //遍历所有旧MarkBehavior，当发现旧marker在新list中不存在的时候，则在标记到删除集合中
-            for (MarkBehavior markBehavior : list_old)
+            //遍历所有旧MarkerBehavior，当发现旧marker在新list中不存在的时候，则在标记到删除集合中
+            for (MarkerBehavior behavior : list_old)
             {
-                if (!list.contains(markBehavior))
+                if (!list.contains(behavior))
                 {
-                    list_remove.add(markBehavior);
+                    list_remove.add(behavior);
                 }
             }
             if (!isAppend)
-                removeMarks(list_remove);
+                removeMarkers(list_remove);
 
-            //遍历所有新list的MarkBehavior，只要该marker未添加到地图上，则标记到添加集合中
-            for (MarkBehavior markBehavior : list)
+            //遍历所有新list的MarkerBehavior，只要该marker未添加到地图上，则标记到添加集合中
+            for (MarkerBehavior behavior : list)
             {
-                if (!list_old.contains(markBehavior))
+                if (!list_old.contains(behavior))
                 {
-                    list_newAdd.add(markBehavior);
+                    list_newAdd.add(behavior);
                 }
             }
 
-            setMarks(list_newAdd);
+            setMarkers(list_newAdd);
         }
 
         @Override
-        public void removeMarks(final List<MarkBehavior> list) {
+        public void removeMarkers(final List<MarkerBehavior> list) {
 
             List<Marker> list_remove = new LinkedList();
             for (Marker marker : list_marker)
@@ -357,7 +357,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
         }
 
         @Override
-        public void clearMarks(){
+        public void clearMarkers(){
             reallyRemoveMarks(list_marker);
         }
 
@@ -567,7 +567,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
         protected abstract int getLocationRadiusColor();
 
         //重写该方法返回Marker样式
-        protected abstract BitmapDescriptor getMarkerDescript(MarkBehavior behavior);
+        protected abstract BitmapDescriptor getMarkerDescript(MarkerBehavior behavior);
 
         //重写该方法返回弹窗样式
         protected abstract View getWindowView(Marker marker);
@@ -588,7 +588,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
         protected abstract void afterGetRouteFinish(List<Route> result, boolean isSuccess);
 
         //兴趣点搜索结束后调用
-        protected abstract void afterGetPoiFinish(List<MarkBean> result, boolean isSuccess);
+        protected abstract void afterGetPoiFinish(List<MarkerBean> result, boolean isSuccess);
 
     }
 
