@@ -19,7 +19,7 @@ import java.util.List;
 
 import static com.xq.androidfaster_map.service.LocationService.ACTION_LOCATION;
 
-public interface IBaseLocationPresenter<T extends IAbsView> extends AbsLocationPresenter<T>{
+public interface IBaseLocationPresenter<T extends IAbsView> extends IAbsLocationPresenter<T> {
 
     @Override
     default void startLocation(){
@@ -33,7 +33,7 @@ public interface IBaseLocationPresenter<T extends IAbsView> extends AbsLocationP
 
     public LocationDelegate getLocationDelegate();
 
-    public abstract class LocationDelegate<T extends IAbsView> extends AbsPresenterDelegate<T> implements AbsLocationPresenter<T>{
+    public abstract class LocationDelegate<T extends IAbsView> extends AbsPresenterDelegate<T> implements IAbsLocationPresenter<T> {
 
         protected Location location;
 

@@ -11,7 +11,6 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
     private double latitude;
     private double longitude;
     private String title;
-    private String littleTitle;
     private Object tag;
 
     public MarkBean() {
@@ -30,21 +29,12 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
         this.tag = tag;
     }
 
-    public MarkBean(double latitude, double longitude, String title, String littleTitle, Object tag) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.title = title;
-        this.littleTitle = littleTitle;
-        this.tag = tag;
-    }
-
     @Override
     public String toString() {
         return "MarkBean{" +
                 "latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", title='" + title + '\'' +
-                ", littleTitle='" + littleTitle + '\'' +
                 ", tag=" + tag +
                 '}';
     }
@@ -59,8 +49,6 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
         if (Double.compare(markBean.latitude, latitude) != 0) return false;
         if (Double.compare(markBean.longitude, longitude) != 0) return false;
         if (title != null ? !title.equals(markBean.title) : markBean.title != null) return false;
-        if (littleTitle != null ? !littleTitle.equals(markBean.littleTitle) : markBean.littleTitle != null)
-            return false;
         return tag != null ? tag.equals(markBean.tag) : markBean.tag == null;
     }
 
@@ -73,7 +61,6 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
         temp = Double.doubleToLongBits(longitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (littleTitle != null ? littleTitle.hashCode() : 0);
         result = 31 * result + (tag != null ? tag.hashCode() : 0);
         return result;
     }
@@ -105,15 +92,6 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
         this.title = title;
     }
 
-    @Override
-    public String getLittleTitle() {
-        return littleTitle;
-    }
-
-    public void setLittleTitle(String littleTitle) {
-        this.littleTitle = littleTitle;
-    }
-
     public Object getTag() {
         return tag;
     }
@@ -132,7 +110,6 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
         dest.writeDouble(this.latitude);
         dest.writeDouble(this.longitude);
         dest.writeString(this.title);
-        dest.writeString(this.littleTitle);
         if (tag instanceof Parcelable)
             dest.writeParcelable((Parcelable) tag, flags);
         else    if (tag instanceof Serializable)
@@ -143,7 +120,6 @@ public class MarkBean implements MarkBehavior,TitleBehavior {
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.title = in.readString();
-        this.littleTitle = in.readString();
         if (tag instanceof Parcelable)
             this.tag = in.readParcelable(Object.class.getClassLoader());
         else    if (tag instanceof Serializable)

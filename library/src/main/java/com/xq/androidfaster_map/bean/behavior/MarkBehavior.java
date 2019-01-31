@@ -24,8 +24,6 @@ public interface MarkBehavior extends Serializable,Parcelable {
 
     public String getTitle();
 
-    public String getLittleTitle();
-
     default Object getTag(){
         return null;
     }

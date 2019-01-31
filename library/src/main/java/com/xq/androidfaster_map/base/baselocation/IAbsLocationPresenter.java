@@ -4,7 +4,7 @@ import android.location.Location;
 import com.xq.androidfaster.base.abs.IAbsPresenter;
 import com.xq.androidfaster.base.abs.IAbsView;
 
-public interface AbsLocationPresenter<T extends IAbsView> extends IAbsPresenter<T> {
+public interface IAbsLocationPresenter<T extends IAbsView> extends IAbsPresenter<T> {
 
     //开始定位
     public void startLocation();
