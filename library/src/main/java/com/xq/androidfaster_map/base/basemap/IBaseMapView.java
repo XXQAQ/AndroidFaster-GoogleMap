@@ -498,16 +498,16 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
 
         @Override
         public void moveMapToLocationPoint(){
-            if (getPresenter().getLocation() != null)
-                moveMapToPoint(new double[]{getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude()});
+            if (getBindPresenter().getLocation() != null)
+                moveMapToPoint(new double[]{getBindPresenter().getLocation().getLatitude(),getBindPresenter().getLocation().getLongitude()});
             else
                 afterGetLocationErro();
         }
 
         @Override
         public void moveMapToLocationPoint(int scale) {
-            if (getPresenter().getLocation() != null)
-                moveMapToPoint(new double[]{getPresenter().getLocation().getLatitude(),getPresenter().getLocation().getLongitude()},scale);
+            if (getBindPresenter().getLocation() != null)
+                moveMapToPoint(new double[]{getBindPresenter().getLocation().getLatitude(),getBindPresenter().getLocation().getLongitude()},scale);
             else
                 afterGetLocationErro();
         }
