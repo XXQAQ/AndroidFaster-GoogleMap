@@ -283,7 +283,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
             {
                 MarkerOptions markerOption = new MarkerOptions();
                 markerOption.position(new LatLng(behavior.getLatitude(),behavior.getLongitude()));
-                markerOption.title(behavior.getTitle());
+                markerOption.title(behavior.getTitle().toString());
                 markerOption.draggable(false);//设置Marker可拖动
                 markerOption.icon(getMarkerDescriptor(behavior));
 //                markerOption.setFlat(false);//设置marker平贴地图效果

@@ -2,11 +2,11 @@ package com.xq.androidfaster_map.bean.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.xq.androidfaster.bean.behavior.TitleBehavior;
 import com.xq.androidfaster_map.bean.behavior.MarkerBehavior;
+import com.xq.worldbean.bean.behavior.TitleBehavior;
 import java.io.Serializable;
 
-public class MarkerBean implements MarkerBehavior,TitleBehavior {
+public class MarkerBean implements MarkerBehavior, TitleBehavior {
 
     private double latitude;
     private double longitude;

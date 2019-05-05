@@ -19,6 +19,8 @@ public class LocationService extends Service {
 
     public static final String ACTION_LOCATION = "com.xq.androidfaster_map.service.LocationService";
 
+    private static Location location;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -47,6 +49,8 @@ public class LocationService extends Service {
 
                 Location location = locationResult.getLastLocation();
 
+                LocationService.location = location;
+
                 Intent intent = new Intent();
                 intent.setAction(ACTION_LOCATION);
                 intent.putExtras(new BundleUtil.Builder().putParcelable(BundleUtil.KEY_DATA,location).build());
@@ -65,4 +69,7 @@ public class LocationService extends Service {
         locationCallback=null;
     }
 
+    public static Location getLocation() {
+        return location;
+    }
 }

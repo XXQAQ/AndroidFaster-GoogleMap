@@ -1,10 +1,10 @@
 package com.xq.androidfaster_map.bean.behavior;
 
 import android.os.Parcel;
-import android.os.Parcelable;
-import java.io.Serializable;
+import com.xq.worldbean.bean.behavior.CoordinateBehavior;
+import com.xq.worldbean.bean.behavior.TitleBehavior;
 
-public interface MarkerBehavior extends Serializable,Parcelable {
+public interface MarkerBehavior extends CoordinateBehavior, TitleBehavior {
 
     @Override
     default int describeContents(){
@@ -16,14 +16,33 @@ public interface MarkerBehavior extends Serializable,Parcelable {
 
     }
 
-    public double getLatitude();
+    @Override
+    default int getId() {
+        return 0;
+    }
 
-    public double getLongitude();
-
-    public String getTitle();
-
+    @Override
     default Object getTag(){
         return null;
     }
+
+    @Override
+    default double getX() {
+        return getLongitude();
+    }
+
+    @Override
+    default double getY() {
+        return getLatitude();
+    }
+
+    @Override
+    default double getZ() {
+        return 0;
+    }
+
+    public double getLatitude();
+
+    public double getLongitude();
 
 }
