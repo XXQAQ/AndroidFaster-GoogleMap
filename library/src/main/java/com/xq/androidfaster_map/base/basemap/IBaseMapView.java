@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import com.directions.route.AbstractRouting;
 import com.directions.route.Route;
@@ -283,7 +284,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
             {
                 MarkerOptions markerOption = new MarkerOptions();
                 markerOption.position(new LatLng(behavior.getLatitude(),behavior.getLongitude()));
-                markerOption.title(behavior.getTitle().toString());
+                if (!TextUtils.isEmpty(behavior.getTitle())) markerOption.title(behavior.getTitle().toString());
                 markerOption.draggable(false);//设置Marker可拖动
                 markerOption.icon(getMarkerDescriptor(behavior));
 //                markerOption.setFlat(false);//设置marker平贴地图效果
