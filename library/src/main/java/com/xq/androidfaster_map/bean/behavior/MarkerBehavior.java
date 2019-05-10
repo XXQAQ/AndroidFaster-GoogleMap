@@ -17,16 +17,6 @@ public interface MarkerBehavior extends CoordinateBehavior, TitleBehavior {
     }
 
     @Override
-    default int getId() {
-        return 0;
-    }
-
-    @Override
-    default Object getTag(){
-        return null;
-    }
-
-    @Override
     default double getX() {
         return getLongitude();
     }

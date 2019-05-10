@@ -16,6 +16,11 @@ public class MarkerBean implements MarkerBehavior, TitleBehavior {
     public MarkerBean() {
     }
 
+    public MarkerBean(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public MarkerBean(double latitude, double longitude, String title) {
         this.latitude = latitude;
         this.longitude = longitude;
