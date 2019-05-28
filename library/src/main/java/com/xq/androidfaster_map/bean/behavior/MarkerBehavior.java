@@ -1,20 +1,10 @@
 package com.xq.androidfaster_map.bean.behavior;
 
-import android.os.Parcel;
+import com.xq.worldbean.bean.behavior.BaseBehavior;
 import com.xq.worldbean.bean.behavior.CoordinateBehavior;
 import com.xq.worldbean.bean.behavior.TitleBehavior;
 
-public interface MarkerBehavior extends CoordinateBehavior, TitleBehavior {
-
-    @Override
-    default int describeContents(){
-        return 0;
-    }
-
-    @Override
-    default void writeToParcel(Parcel dest, int flags){
-
-    }
+public interface MarkerBehavior<T extends MarkerBehavior> extends BaseBehavior<T>, CoordinateBehavior<T>, TitleBehavior<T> {
 
     @Override
     default double getX() {
@@ -33,6 +23,10 @@ public interface MarkerBehavior extends CoordinateBehavior, TitleBehavior {
 
     public double getLatitude();
 
+    public T setLatitude(double latitude);
+
     public double getLongitude();
+
+    public T setLongitude(double longitude);
 
 }
