@@ -23,10 +23,14 @@ public interface MarkerBehavior<T extends MarkerBehavior> extends BaseBehavior<T
 
     public double getLatitude();
 
-    public T setLatitude(double latitude);
+    default T setLatitude(double latitude) {
+        return (T) this;
+    }
 
     public double getLongitude();
 
-    public T setLongitude(double longitude);
+    default T setLongitude(double longitude) {
+        return (T) this;
+    }
 
 }
