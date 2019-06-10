@@ -58,8 +58,8 @@ public interface IBaseLocationPresenter<T extends IAbsView> extends IAbsLocation
         }
 
         @Override
-        public void afterOnCreate(Bundle bundle) {
-            super.afterOnCreate(bundle);
+        public void create(Bundle bundle) {
+            super.create(bundle);
 
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,new IntentFilter(ACTION_LOCATION));
 
@@ -78,8 +78,8 @@ public interface IBaseLocationPresenter<T extends IAbsView> extends IAbsLocation
         }
 
         @Override
-        public void onDestroy() {
-            super.onDestroy();
+        public void destroy() {
+            super.destroy();
             LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
         }
 
