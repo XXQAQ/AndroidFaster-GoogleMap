@@ -39,22 +39,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T> {
 
     @Override
-    default void setMarkers(List<MarkerBehavior> list){
+    default void setMarkers(List list){
         getMapDelegate().setMarkers(list);
     }
 
     @Override
-    default void setDifferentMarkers(final List<MarkerBehavior> list){
+    default void setDifferentMarkers(final List list){
         getMapDelegate().setDifferentMarkers(list);
     }
 
     @Override
-    default void setDifferentMarkers(final List<MarkerBehavior> list, boolean isAppend) {
+    default void setDifferentMarkers(final List list, boolean isAppend) {
         getMapDelegate().setDifferentMarkers(list,isAppend);
     }
 
     @Override
-    default void removeMarkers(final List<MarkerBehavior> list) {
+    default void removeMarkers(final List list) {
         getMapDelegate().removeMarkers(list);
     }
 
@@ -276,12 +276,13 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
         }
 
         @Override
-        public void setMarkers(List<MarkerBehavior> list){
+        public void setMarkers(List list){
 
             List<Marker> list_newMarker = new LinkedList<>();
 
-            for (MarkerBehavior behavior : list)
+            for (Object o : list)
             {
+                MarkerBehavior behavior = (MarkerBehavior) o;
                 MarkerOptions markerOption = new MarkerOptions();
                 markerOption.position(new LatLng(behavior.getLatitude(),behavior.getLongitude()));
                 if (!TextUtils.isEmpty(behavior.getTitle())) markerOption.title(behavior.getTitle().toString());
@@ -305,12 +306,12 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
         }
 
         @Override
-        public void setDifferentMarkers(List<MarkerBehavior> list) {
+        public void setDifferentMarkers(List list) {
             setDifferentMarkers(list,false);
         }
 
         @Override
-        public void setDifferentMarkers(final List<MarkerBehavior> list, boolean isAppend){
+        public void setDifferentMarkers(final List list, boolean isAppend){
 
             final List<MarkerBehavior> list_old = new LinkedList<>();
             final List<MarkerBehavior> list_remove = new LinkedList<>();
@@ -334,11 +335,11 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
                 removeMarkers(list_remove);
 
             //遍历所有新list的MarkerBehavior，只要该marker未添加到地图上，则标记到添加集合中
-            for (MarkerBehavior behavior : list)
+            for (Object o : list)
             {
-                if (!list_old.contains(behavior))
+                if (!list_old.contains(o))
                 {
-                    list_newAdd.add(behavior);
+                    list_newAdd.add((MarkerBehavior) o);
                 }
             }
 
@@ -346,7 +347,7 @@ public interface IBaseMapView<T extends IBaseMapPresenter> extends IAbsMapView<T
         }
 
         @Override
-        public void removeMarkers(final List<MarkerBehavior> list) {
+        public void removeMarkers(final List list) {
 
             List<Marker> list_remove = new LinkedList();
             for (Marker marker : list_marker)

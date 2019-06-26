@@ -7,16 +7,16 @@ import java.util.List;
 public interface IAbsMapView<T extends IAbsMapPresenter> extends IAbsView<T> {
 
     //设置Markers(不会对地图上已添加的Markers去重)
-    public void setMarkers(List<MarkerBehavior> list);
+    public void setMarkers(List list);
 
     //设置Markers(对重复添加的Markers去重，且使用覆盖模式)
-    public void setDifferentMarkers(final List<MarkerBehavior> list);
+    public void setDifferentMarkers(final List list);
 
     //设置Markers(对重复添加的Markers去重，isAppend表示追加模式或者覆盖模式)
-    public void setDifferentMarkers(final List<MarkerBehavior> list, boolean isAppend);
+    public void setDifferentMarkers(final List list, boolean isAppend);
 
     //删除指定Markers
-    public void removeMarkers(final List<MarkerBehavior> list);
+    public void removeMarkers(final List list);
 
     //清空所有Markers
     public void clearMarkers();
